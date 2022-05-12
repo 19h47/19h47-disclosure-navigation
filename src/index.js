@@ -1,7 +1,5 @@
 import { ARROW_DOWN, ESCAPE } from '@19h47/keycode';
-import { state, keyboardNavigation } from '@19h47/keyboard-navigation';
-
-console.log(state, keyboardNavigation);
+import keyboardNavigation from '@19h47/keyboard-navigation';
 
 const toggleMenu = (domNode, show) => {
 	if (domNode) {
@@ -36,11 +34,11 @@ class DisclosureMenu {
 				// save ref controlled menu
 				this.children.push($child);
 
-				// collapse menus
+				// Collapse menus
 				$button.setAttribute('aria-expanded', false);
 				toggleMenu($child, false);
 
-				// attach event listeners
+				// Attach event listeners
 				$child.addEventListener('keydown', e => this.onMenuKeydown(e));
 
 				$button.addEventListener('click', e => this.onButtonClick(e));
@@ -72,54 +70,60 @@ class DisclosureMenu {
 		const key = event.keyCode || event.which;
 		const index = this.buttons.indexOf(document.activeElement);
 
-		// close on escape
+		// Close on escape
 		if (ESCAPE === key) {
 			this.toggleExpand(this.index, false);
 		}
 
-		// move focus into the open menu if the current menu is open
+		// Move focus into the open menu if the current menu is open
 		else if (this.useArrowKeys && this.index === index && ARROW_DOWN === key) {
 			event.preventDefault();
+
 			this.children[this.index].querySelector('a').focus();
 		}
 
-		// handle arrow key navigation between top-level buttons, if set
+		// Handle arrow key navigation between top-level buttons, if set
 		else if (this.useArrowKeys) {
-			keyboardNavigation(event, this.buttons, index);
+			return keyboardNavigation(event, this.buttons, index);
 		}
+
+		return true;
 	}
 
 	onMenuKeydown(event) {
-		const key = event.keyCode || event.which;
 
 		if (null === this.index) {
-			return;
+			return true;
 		}
 
+		const key = event.keyCode || event.which;
 		const links = [...this.children[this.index].querySelectorAll('a')];
 		const index = links.indexOf(document.activeElement);
 
-		// close on escape
+		// Close on escape
 		if (ESCAPE === key) {
 			this.buttons[this.index].focus();
-			this.toggleExpand(this.index, false);
+
+			return this.toggleExpand(this.index, false);
 		}
 
-		// handle arrow key navigation within menu links, if set
-		else if (this.useArrowKeys) {
-			keyboardNavigation(event, links, index);
+		// Handle arrow key navigation within menu links, if set
+		if (this.useArrowKeys) {
+			return keyboardNavigation(event, links, index);
 		}
+
+		return true;
 	}
 
 	toggleExpand(index, expanded) {
-		console.log('toggleExpand', this.index, index, expanded);
+		// console.log('toggleExpand', this.index, index, expanded);
 
-		// close open menu, if applicable
+		// Close open menu, if applicable
 		if (this.index !== index) {
 			this.toggleExpand(this.index, false);
 		}
 
-		// handle menu at called index
+		// Handle menu at called index
 		if (this.buttons[index]) {
 			this.index = expanded ? index : null;
 			this.buttons[index].setAttribute('aria-expanded', expanded);

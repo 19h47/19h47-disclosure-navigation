@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@19h47/keyboard-navigation@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@19h47/keyboard-navigation/-/keyboard-navigation-0.0.4.tgz#8ee967566d340ec5c0afe2c621606ed5d1d5ce34"
-  integrity sha512-58ocPtEiE+riVUYZ80SERJf1VTlHf00zGqyNMTDGlSIkqn/sCdF6HR4ewAnmDtIYiZ4JLPeegMJfT6q4nxHxOA==
+"@19h47/keyboard-navigation@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@19h47/keyboard-navigation/-/keyboard-navigation-0.0.8.tgz#3e3ae6ced3ef42343accdf95eca9ba731cc33706"
+  integrity sha512-GWX/cMkpZODwCWEBCvrpUEDVLR21jSbZEp6ayviPS/4M4iOAgHqi1A5SIh/0/6GiXSKBlMIfj8SaHafLiKH4dA==
   dependencies:
     "@19h47/keycode" "^3.0.3"
 

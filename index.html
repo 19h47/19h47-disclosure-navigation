@@ -7,9 +7,9 @@
 		<title>DisclosureMenu</title>
 		<link rel="icon" type="image/png" href="radio-button.png" />
 		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
 			rel="stylesheet"
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-			integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
 			crossorigin="anonymous"
 		/>
 		<link
@@ -18,7 +18,11 @@
 			integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
 			crossorigin="anonymous"
 		/>
-		<style></style>
+		<style>
+			a:focus {
+				background-color: red;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container">
@@ -38,31 +42,52 @@ const disclosureMenu = new DisclosureMenu($element);
 disclosureMenu.init();</code></pre>
 			</div>
 			<div class="my-5 col-12 js-disclosure-menu">
-				<button type="button" aria-controls="lorem-ipsum" aria-expanded="false">1</button>
-				<button type="button" aria-controls="dolor-sit" aria-expanded="false">2</button>
-				<button type="button" aria-controls="amet-consectetur" aria-expanded="false">
-					3
-				</button>
+				<div class="btn-group" role="group" aria-label="">
+					<button
+						class="btn btn-primary"
+						type="button"
+						aria-controls="lorem-ipsum"
+						aria-expanded="false"
+					>
+						Lorem ipsum
+					</button>
+					<button
+						class="btn btn-primary"
+						type="button"
+						aria-controls="dolor-sit"
+						aria-expanded="false"
+					>
+						Dolor sit
+					</button>
+					<button
+						class="btn btn-primary"
+						type="button"
+						aria-controls="amet-consectetur"
+						aria-expanded="false"
+					>
+						Amet consectetur
+					</button>
+				</div>
 
-				<ul id="lorem-ipsum">
-					<li><a href="">Lorem ipsum dolor</a></li>
-					<li><a href="">Sit amet consectetur</a></li>
-					<li><a href="">Adipisicing elit</a></li>
-					<li><a href="">Beatae laudantium</a></li>
+				<ul id="lorem-ipsum" class="list-group" aria-labelledby="">
+					<li class="list-group-item"><a href="">Lorem ipsum dolor</a></li>
+					<li class="list-group-item"><a href="">Sit amet consectetur</a></li>
+					<li class="list-group-item"><a href="">Adipisicing elit</a></li>
+					<li class="list-group-item"><a href="">Beatae laudantium</a></li>
 				</ul>
-				<ul id="dolor-sit">
-					<li><a href="">Dolor sit amet</a></li>
-					<li><a href="">Consectetur adipisicing</a></li>
-					<li><a href="">Elit beatae</a></li>
-					<li><a href="">Laudantium totam iusto</a></li>
+				<ul id="dolor-sit" class="list-group" aria-labelledby="">
+					<li class="list-group-item"><a href="">Dolor sit amet</a></li>
+					<li class="list-group-item"><a href="">Consectetur adipisicing</a></li>
+					<li class="list-group-item"><a href="">Elit beatae</a></li>
+					<li class="list-group-item"><a href="">Laudantium totam iusto</a></li>
 				</ul>
-				<ul id="amet-consectetur">
-					<li><a href="">Amet consectetur</a></li>
-					<li><a href="">Adipisicing elit</a></li>
-					<li><a href="">Beatae laudantium </a></li>
-					<li><a href="">Totam iusto aliquam esse</a></li>
-					<li><a href="">Magnam saepe</a></li>
-					<li><a href="">Nisi labore dicta</a></li>
+				<ul id="amet-consectetur" class="list-group" aria-labelledby="">
+					<li class="list-group-item"><a href="">Amet consectetur</a></li>
+					<li class="list-group-item"><a href="">Adipisicing elit</a></li>
+					<li class="list-group-item"><a href="">Beatae laudantium </a></li>
+					<li class="list-group-item"><a href="">Totam iusto aliquam esse</a></li>
+					<li class="list-group-item"><a href="">Magnam saepe</a></li>
+					<li class="list-group-item"><a href="">Nisi labore dicta</a></li>
 				</ul>
 			</div>
 		</div>
