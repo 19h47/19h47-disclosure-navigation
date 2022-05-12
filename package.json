@@ -1,6 +1,6 @@
 {
 	"name": "@19h47/disclosure-menu",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "",
 	"keywords": [
 		"disclosure",
@@ -27,7 +27,7 @@
 		"start": "webpack-dev-server --mode=development --hot --config webpack/webpack.config.js"
 	},
 	"dependencies": {
-		"@19h47/keyboard-navigation": "^0.0.8",
+		"@19h47/keyboard-navigation": "^0.0.9",
 		"@19h47/keycode": "^3.0.3"
 	},
 	"devDependencies": {

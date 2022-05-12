@@ -84,6 +84,7 @@ class DisclosureMenu {
 
 		// Handle arrow key navigation between top-level buttons, if set
 		else if (this.useArrowKeys) {
+			console.log(keyboardNavigation);
 			return keyboardNavigation(event, this.buttons, index);
 		}
 
