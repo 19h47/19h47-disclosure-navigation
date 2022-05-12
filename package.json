@@ -1,0 +1,64 @@
+{
+	"name": "@19h47/disclosure-menu",
+	"version": "0.0.0",
+	"description": "",
+	"keywords": [
+		"disclosure",
+		"navigation",
+		"nav",
+		"menu",
+		"ES6"
+	],
+	"homepage": "https://github.com/19h47/19h47-disclosure-menu#readme",
+	"bugs": {
+		"url": "https://github.com/19h47/19h47-disclosure-menu/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/19h47/19h47-disclosure-menu.git"
+	},
+	"license": "ISC",
+	"author": "Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)",
+	"main": "dist/main.js",
+	"scripts": {
+		"deploy": "npm login && npm run prod && npm publish",
+		"dev": "webpack --mode=development --config webpack/webpack.config.js",
+		"prod": "webpack --mode=production --config webpack/webpack.config.js",
+		"start": "webpack-dev-server --mode=development --hot --config webpack/webpack.config.js"
+	},
+	"dependencies": {
+		"@19h47/keyboard-navigation": "^0.0.4",
+		"@19h47/keycode": "^3.0.3"
+	},
+	"devDependencies": {
+		"@19h47/prettier-config": "19h47/prettier-config",
+		"@babel/core": "^7.17.10",
+		"@babel/eslint-parser": "^7.17.0",
+		"@babel/eslint-plugin": "^7.17.7",
+		"@babel/plugin-proposal-class-properties": "^7.16.7",
+		"@babel/plugin-syntax-dynamic-import": "^7.8.3",
+		"@babel/plugin-transform-parameters": "^7.16.7",
+		"@babel/plugin-transform-runtime": "^7.17.10",
+		"@babel/preset-env": "^7.17.10",
+		"@babel/runtime": "^7.17.9",
+		"babel-loader": "^8.2.5",
+		"clean-webpack-plugin": "^4.0.0",
+		"core-js": "^3.22.5",
+		"eslint": "^8.15.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-config-standard": "^16.0.3",
+		"eslint-import-resolver-webpack": "^0.13.2",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-node": "^11.0.0",
+		"eslint-plugin-promise": "^6.0.0",
+		"eslint-webpack-plugin": "^3.1.1",
+		"html-webpack-plugin": "^5.5.0",
+		"prettier": "^2.6.2",
+		"webpack": "^5.72.1",
+		"webpack-cli": "^4.9.2",
+		"webpack-dev-server": "^4.9.0",
+		"webpack-merge": "^5.8.0",
+		"webpack-notifier": "^1.15.0"
+	}
+}

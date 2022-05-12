@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>DisclosureMenu</title>
+		<link rel="icon" type="image/png" href="radio-button.png" />
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+			integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism.min.css"
+			integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+			crossorigin="anonymous"
+		/>
+		<style></style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="my-5 col-12">
+				<h1 class="m-0">
+					<a href="https://github.com/19h47/19h47-radiogroup">DisclosureMenu</a>
+				</h1>
+			</div>
+			<div class="my-5 col-12">
+				<pre
+					class="p-3 m-0"
+				><code class="language-javascript">import DisclosureMenu from '@19h47/disclosure-menu';
+
+const $element = document.querySelector('.js-disclosure-menu');
+const disclosureMenu = new DisclosureMenu($element);
+
+disclosureMenu.init();</code></pre>
+			</div>
+			<div class="my-5 col-12 js-disclosure-menu">
+				<button type="button" aria-controls="lorem-ipsum" aria-expanded="false">1</button>
+				<button type="button" aria-controls="dolor-sit" aria-expanded="false">2</button>
+				<button type="button" aria-controls="amet-consectetur" aria-expanded="false">
+					3
+				</button>
+
+				<ul id="lorem-ipsum">
+					<li><a href="">Lorem ipsum dolor</a></li>
+					<li><a href="">Sit amet consectetur</a></li>
+					<li><a href="">Adipisicing elit</a></li>
+					<li><a href="">Beatae laudantium</a></li>
+				</ul>
+				<ul id="dolor-sit">
+					<li><a href="">Dolor sit amet</a></li>
+					<li><a href="">Consectetur adipisicing</a></li>
+					<li><a href="">Elit beatae</a></li>
+					<li><a href="">Laudantium totam iusto</a></li>
+				</ul>
+				<ul id="amet-consectetur">
+					<li><a href="">Amet consectetur</a></li>
+					<li><a href="">Adipisicing elit</a></li>
+					<li><a href="">Beatae laudantium </a></li>
+					<li><a href="">Totam iusto aliquam esse</a></li>
+					<li><a href="">Magnam saepe</a></li>
+					<li><a href="">Nisi labore dicta</a></li>
+				</ul>
+			</div>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/prism.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+		<script src="./main.js"></script>
+		<script>
+			const $element = document.querySelector('.js-disclosure-menu');
+			const disclosureMenu = new DisclosureMenu.default($element);
+
+			disclosureMenu.init();
+		</script>
+	</body>
+</html>
