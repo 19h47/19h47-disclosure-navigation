@@ -16,8 +16,8 @@ const resolve = require('./webpack.utils');
 
 module.exports = {
 	entry: {
-		dist: resolve('src/index.js'),
-		docs: resolve('src/index.js'),
+		dist: resolve('src/index.ts'),
+		docs: resolve('src/index.ts'),
 	},
 	output: {
 		library: 'DisclosureMenu',
@@ -31,6 +31,7 @@ module.exports = {
 		compress: true,
 	},
 	resolve: {
+		extensions: ['.ts', '.tsx', '.js'],
 		alias: {
 			'@': resolve('src'),
 			Utils: resolve('src/utils'),
@@ -39,9 +40,9 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.tsx?$/,
+				use: 'ts-loader',
 				exclude: /node_modules/,
-				loader: 'babel-loader',
 			},
 		],
 	},
