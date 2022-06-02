@@ -1,3 +1,3 @@
 # @19h47/disclosure-menu
 
-[Disclosure navigation](https://www.w3.org/TR/wai-aria-practices-1.1/examples/disclosure/disclosure-navigation.html)
+[Disclosure navigation](https://w3c.github.io/aria-practices/examples/disclosure/disclosure-navigation.html)

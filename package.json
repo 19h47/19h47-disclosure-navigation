@@ -1,13 +1,14 @@
 {
 	"name": "@19h47/disclosure-menu",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "",
 	"keywords": [
 		"disclosure",
 		"navigation",
 		"nav",
 		"menu",
-		"ES6"
+		"ES6",
+		"TypeScript"
 	],
 	"homepage": "https://github.com/19h47/19h47-disclosure-menu#readme",
 	"bugs": {

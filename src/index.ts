@@ -1,17 +1,15 @@
 // @ts-ignore
-import { ESCAPE } from '@19h47/keycode';
-// @ts-ignore
 import keyboardNavigation from '@19h47/keyboard-navigation';
 
-const toggleMenu = (domNode: HTMLElement, show: boolean) => {
-	if (domNode) {
-		if (show) {
-			domNode.style.removeProperty('display');
-		} else {
-			domNode.style.setProperty('display', 'none');
-		}
+const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
+	if (show) {
+		return domNode?.style.removeProperty('display');
 	}
+
+	return domNode?.style.setProperty('display', 'none');
 };
+
+// TODO: Remove ts-ignore
 
 /**
  * DisclosureMenu
@@ -62,102 +60,95 @@ class DisclosureMenu {
 		this.el.addEventListener('focusout', e => this.onBlur(e));
 	}
 
-	close() {
-		// @ts-ignore
-		this.toggleExpand(this.index, false);
-	}
+	// close(): void {
+	// 	this.toggle(this.index, false);
+	// }
+
 	// @ts-ignore
-	onBlur({ relatedTarget }) {
+	onBlur({ relatedTarget }): void {
 		// @ts-ignore
 		if (!this.el.contains(relatedTarget) && null !== this.index) {
 			// @ts-ignore
-			this.toggleExpand(this.index, false);
+			this.toggle(this.index, false);
 		}
 	}
+
 	// @ts-ignore
-	onButtonClick({ target }) {
+	onButtonClick({ target }): void {
 		// @ts-ignore
 		const index = this.buttons.indexOf(target);
 		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
 
-		this.toggleExpand(index, !expanded);
+		this.toggle(index, !expanded);
 	}
-	// @ts-ignore
-	onButtonKeydown(event) {
-		const { key } = event;
-		// @ts-ignore
-		const index = this.buttons.indexOf(document.activeElement);
 
-		console.log('onButtonKeydown', key);
+	// @ts-ignore
+	onButtonKeydown(event): boolean | void {
+		const { key } = event;
+		const index = this.buttons.indexOf(document.activeElement as never);
+
+		// console.log('onButtonKeydown', key);
 
 		// Close on escape
 		if ('Escape' === key) {
-			// @ts-ignore
-			this.toggleExpand(this.index, false);
+			return this.toggle(this.index, false);
 		}
 
 		// Move focus into the open menu if the current menu is open
-		else if (this.useArrowKeys && this.index === index && 'ArrowDown' === key) {
+		if (this.useArrowKeys && this.index === index && 'ArrowDown' === key) {
 			event.preventDefault();
 
-			this.children[this.index]?.querySelector('a')?.focus();
+			return this.children[this.index]?.querySelector('a')?.focus();
 		}
 
 		// Handle arrow key navigation between top-level buttons, if set
-		else if (this.useArrowKeys) {
-			return keyboardNavigation(event, this.buttons, index);
-		}
-
-		return true;
+		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
 	}
+
 	// @ts-ignore
-	onMenuKeydown(event) {
+	onMenuKeydown(event): boolean | void {
 		if (null === this.index) {
 			return true;
 		}
 
 		const { key } = event;
 		const links = [...this.children[this.index]?.querySelectorAll('a')];
-		// @ts-ignore
-		const index = links.indexOf(document.activeElement);
+		const index = links?.indexOf(document.activeElement as HTMLAnchorElement);
 
 		// Close on escape
 		if ('Escape' === key) {
 			this.buttons[this.index]?.focus();
 
-			return this.toggleExpand(this.index, false);
+			return this.toggle(this.index, false);
 		}
 
 		// Handle arrow key navigation within menu links, if set
-		if (this.useArrowKeys) {
-			return keyboardNavigation(event, links, index);
-		}
-
-		return true;
+		return this.useArrowKeys && keyboardNavigation(event, links, index);
 	}
 
-	toggleExpand(index: number, expanded: boolean) {
-		// console.log('toggleExpand', this.index, index, expanded);
+	toggle(index: number | null, expanded: boolean): void {
+		console.log('toggle', this.index, index, expanded);
 
 		// Close open menu, if applicable
 		if (this.index !== index) {
-			// @ts-ignore
-			this.toggleExpand(this.index, false);
+			this.toggle(this.index as number, false);
 		}
 
 		// Handle menu at called index
 		// @ts-ignore
 		if (this.buttons[index]) {
 			this.index = expanded ? index : null;
+			// @ts-ignore
 			this.buttons[index].setAttribute('aria-expanded', expanded.toString());
 
+			// @ts-ignore
 			toggleMenu(this.children[index], expanded);
 		}
 	}
-	// @ts-ignore
-	updateKeyControls(useArrowKeys: boolean) {
-		this.useArrowKeys = useArrowKeys;
-	}
+
+	// updateKeyControls(useArrowKeys: boolean): void {
+	// 	this.useArrowKeys = useArrowKeys;
+	// }
 }
 
 export default DisclosureMenu;
