@@ -18,7 +18,7 @@ const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
  */
 class DisclosureMenu {
 	el: HTMLElement;
-	buttons: HTMLElement[] | [];
+	buttons: HTMLButtonElement[] | [];
 	children: HTMLElement[] | [];
 	index: number | null;
 	useArrowKeys: boolean;
@@ -26,7 +26,7 @@ class DisclosureMenu {
 	constructor(el: HTMLElement) {
 		this.el = el;
 		this.buttons = [...this.el.querySelectorAll('button[aria-expanded][aria-controls]')] as
-			| HTMLElement[]
+			| HTMLButtonElement[]
 			| [];
 		this.children = [];
 		this.index = null;
@@ -36,7 +36,7 @@ class DisclosureMenu {
 	init() {
 		this.buttons.forEach($button => {
 			const id = $button.getAttribute('aria-controls');
-			const $child = this.el.querySelector(`#${id}`) as HTMLElement;
+			const $child = this.el.querySelector<HTMLDivElement>(`#${id}`)!;
 
 			if ($child) {
 				// save ref controlled menu
@@ -127,7 +127,7 @@ class DisclosureMenu {
 	}
 
 	toggle(index: number | null, expanded: boolean): void {
-		console.log('toggle', this.index, index, expanded);
+		// console.log('toggle', this.index, index, expanded);
 
 		// Close open menu, if applicable
 		if (this.index !== index) {

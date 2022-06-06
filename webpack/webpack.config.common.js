@@ -16,8 +16,8 @@ const resolve = require('./webpack.utils');
 
 module.exports = {
 	entry: {
-		dist: resolve('src/index.ts'),
-		docs: resolve('src/index.ts'),
+		dist: resolve('lib/index.ts'),
+		docs: resolve('lib/index.ts'),
 	},
 	output: {
 		library: 'DisclosureMenu',

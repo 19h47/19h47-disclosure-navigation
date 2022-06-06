@@ -19,5 +19,5 @@
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true
 	},
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["webpack", "node_modules", "dist", "docs"]
 }
