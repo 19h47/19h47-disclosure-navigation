@@ -64,24 +64,26 @@ class DisclosureMenu {
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
 
-
-		if (relatedTarget instanceof Node && !this.el.contains(relatedTarget) && null !== this.index) {
+		// @ts-ignore
+		if (!this.el.contains(relatedTarget)) {
 			this.toggle(this.index as number, false);
 		}
 	}
 
 	onButtonClick(event: MouseEvent): void {
-		const { target } = event
+		const { target } = event;
 
 		// @ts-ignore
 		const index = this.buttons.indexOf(target);
 		// @ts-ignore
 		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
 
+		console.log('click',index, expanded);
+
 		this.toggle(index, !expanded);
 	}
 
-	onButtonKeydown(event : KeyboardEvent): boolean | void {
+	onButtonKeydown(event: KeyboardEvent): boolean | void {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
 
@@ -103,7 +105,7 @@ class DisclosureMenu {
 		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
 	}
 
-	onMenuKeydown(event : any): boolean | void {
+	onMenuKeydown(event: any): boolean | void {
 		if (null === this.index) {
 			return true;
 		}
@@ -124,15 +126,16 @@ class DisclosureMenu {
 	}
 
 	toggle(index: number | null, expanded: boolean): void {
-		// console.log('toggle', this.index, index, expanded);
+		console.log('toggle', this.index, index, expanded);
 
 		// Close open menu, if applicable
 		if (this.index !== index) {
+			console.log('close');
 			this.toggle(this.index as number, false);
 		}
 
 		// Handle menu at called index
-		if (index && this.buttons[index]) {
+		if (index !== null && this.buttons[index]) {
 			this.index = expanded ? index : null;
 
 			this.buttons[index].setAttribute('aria-expanded', expanded.toString());
