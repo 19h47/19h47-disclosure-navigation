@@ -1,6 +1,6 @@
 {
 	"name": "@19h47/disclosure-menu",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "",
 	"keywords": [
 		"disclosure",
@@ -31,7 +31,7 @@
 		"serve": "webpack-dev-server --mode=development --hot --config webpack/webpack.config.js"
 	},
 	"dependencies": {
-		"@19h47/keyboard-navigation": "^0.0.9"
+		"@19h47/keyboard-navigation": "^0.2.0"
 	},
 	"devDependencies": {
 		"@19h47/prettier-config": "19h47/prettier-config",
