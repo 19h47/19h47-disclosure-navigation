@@ -1,6 +1,14 @@
 
 import keyboardNavigation from '@19h47/keyboard-navigation';
 
+/**
+ * Toggle Menu
+ *
+ * @param {HTMLElement} domNode
+ * @param {boolean} show
+ *
+ * @returns
+ */
 const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
 	if (show) {
 		return domNode?.style.removeProperty('display');
@@ -12,7 +20,7 @@ const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
 // TODO: Remove ts-ignore
 
 /**
- * DisclosureMenu
+ * Disclosure Menu
  *
  * @see https://www.w3.org/WAI/content-assets/wai-aria-practices/patterns/disclosure/examples/js/disclosureMenu.js
  */
@@ -23,6 +31,11 @@ class DisclosureMenu {
 	index: number | null;
 	useArrowKeys: boolean;
 
+	/**
+	 * Constructor
+	 *
+	 * @param {HTMLElement} el
+	 */
 	constructor(el: HTMLElement) {
 		this.el = el;
 		this.buttons = [...this.el.querySelectorAll('button[aria-expanded][aria-controls]')] as HTMLButtonElement[];
@@ -31,6 +44,9 @@ class DisclosureMenu {
 		this.useArrowKeys = true;
 	}
 
+	/**
+	 * Init
+	 */
 	init() {
 		this.buttons.forEach($button => {
 			const id = $button.getAttribute('aria-controls');
@@ -60,7 +76,11 @@ class DisclosureMenu {
 	// 	this.toggle(this.index, false);
 	// }
 
-
+	/**
+	 * On Blur
+	 *
+	 * @param {FocusEvent} event
+	 */
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
 
@@ -70,6 +90,11 @@ class DisclosureMenu {
 		}
 	}
 
+	/**
+	 * On Button Click
+	 *
+	 * @param {MouseEvent} event
+	 */
 	onButtonClick(event: MouseEvent): void {
 		const { target } = event;
 
@@ -83,6 +108,13 @@ class DisclosureMenu {
 		this.toggle(index, !expanded);
 	}
 
+	/**
+	 * On Button Keydown
+	 *
+	 * @param {KeyboardEvent} event
+	 *
+	 * @returns
+	 */
 	onButtonKeydown(event: KeyboardEvent): boolean | void {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
@@ -105,7 +137,14 @@ class DisclosureMenu {
 		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
 	}
 
-	onMenuKeydown(event: any): boolean | void {
+	/**
+	 * On Menu Keydown
+	 *
+	 * @param {KeyboardEvent} event
+	 *
+	 * @returns
+	 */
+	onMenuKeydown(event: KeyboardEvent): boolean | void {
 		if (null === this.index) {
 			return true;
 		}
@@ -125,6 +164,12 @@ class DisclosureMenu {
 		return this.useArrowKeys && keyboardNavigation(event, links, index);
 	}
 
+	/**
+	 * Toggle
+	 *
+	 * @param {number|null} index
+	 * @param {boolean} expanded
+	 */
 	toggle(index: number | null, expanded: boolean): void {
 		console.log('toggle', this.index, index, expanded);
 
