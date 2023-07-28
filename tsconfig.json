@@ -15,9 +15,9 @@
 			"~/*": ["./*"],
 			"@/*": ["./*"]
 		},
-		"types": ["@types/node"],
+		"types": ["./types/@19h47/keyboard-navigation", "@types/node"],
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true
 	},
-	"exclude": ["webpack", "node_modules", "dist", "docs"]
+	"exclude": ["webpack", "node_modules", "dist", "docs"],
 }

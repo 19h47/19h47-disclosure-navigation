@@ -1,4 +1,4 @@
-// @ts-ignore
+
 import keyboardNavigation from '@19h47/keyboard-navigation';
 
 const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
@@ -14,20 +14,18 @@ const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
 /**
  * DisclosureMenu
  *
- * @see https://www.w3.org/TR/wai-aria-practices/examples/disclosure/js/disclosureMenu.js
+ * @see https://www.w3.org/WAI/content-assets/wai-aria-practices/patterns/disclosure/examples/js/disclosureMenu.js
  */
 class DisclosureMenu {
 	el: HTMLElement;
 	buttons: HTMLButtonElement[] | [];
-	children: HTMLElement[] | [];
+	children: HTMLElement[];
 	index: number | null;
 	useArrowKeys: boolean;
 
 	constructor(el: HTMLElement) {
 		this.el = el;
-		this.buttons = [...this.el.querySelectorAll('button[aria-expanded][aria-controls]')] as
-			| HTMLButtonElement[]
-			| [];
+		this.buttons = [...this.el.querySelectorAll('button[aria-expanded][aria-controls]')] as HTMLButtonElement[];
 		this.children = [];
 		this.index = null;
 		this.useArrowKeys = true;
@@ -36,11 +34,11 @@ class DisclosureMenu {
 	init() {
 		this.buttons.forEach($button => {
 			const id = $button.getAttribute('aria-controls');
-			const $child = this.el.querySelector<HTMLDivElement>(`#${id}`)!;
+			const $child = this.el.querySelector<HTMLElement>(`#${id}`);
 
 			if ($child) {
 				// save ref controlled menu
-				// @ts-ignore
+
 				this.children.push($child);
 
 				// Collapse menus
@@ -48,42 +46,42 @@ class DisclosureMenu {
 				toggleMenu($child, false);
 
 				// Attach event listeners
-				// @ts-ignore
-				$child.addEventListener('keydown', e => this.onMenuKeydown(e));
-				// @ts-ignore
-				$button.addEventListener('click', e => this.onButtonClick(e));
-				// @ts-ignore
-				$button.addEventListener('keydown', e => this.onButtonKeydown(e));
+
+				$child.addEventListener('keydown', (e: KeyboardEvent) => this.onMenuKeydown(e));
+				$button.addEventListener('click', (e: MouseEvent) => this.onButtonClick(e));
+				$button.addEventListener('keydown', (e: KeyboardEvent) => this.onButtonKeydown(e));
 			}
 		});
-		// @ts-ignore
-		this.el.addEventListener('focusout', e => this.onBlur(e));
+
+		this.el.addEventListener('focusout', (e: FocusEvent) => this.onBlur(e));
 	}
 
 	// close(): void {
 	// 	this.toggle(this.index, false);
 	// }
 
-	// @ts-ignore
-	onBlur({ relatedTarget }): void {
-		// @ts-ignore
-		if (!this.el.contains(relatedTarget) && null !== this.index) {
-			// @ts-ignore
-			this.toggle(this.index, false);
+
+	onBlur(event: FocusEvent): void {
+		const { relatedTarget } = event;
+
+
+		if (relatedTarget instanceof Node && !this.el.contains(relatedTarget) && null !== this.index) {
+			this.toggle(this.index as number, false);
 		}
 	}
 
-	// @ts-ignore
-	onButtonClick({ target }): void {
+	onButtonClick(event: MouseEvent): void {
+		const { target } = event
+
 		// @ts-ignore
 		const index = this.buttons.indexOf(target);
+		// @ts-ignore
 		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
 
 		this.toggle(index, !expanded);
 	}
 
-	// @ts-ignore
-	onButtonKeydown(event): boolean | void {
+	onButtonKeydown(event : KeyboardEvent): boolean | void {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
 
@@ -105,8 +103,7 @@ class DisclosureMenu {
 		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
 	}
 
-	// @ts-ignore
-	onMenuKeydown(event): boolean | void {
+	onMenuKeydown(event : any): boolean | void {
 		if (null === this.index) {
 			return true;
 		}
@@ -135,13 +132,11 @@ class DisclosureMenu {
 		}
 
 		// Handle menu at called index
-		// @ts-ignore
-		if (this.buttons[index]) {
+		if (index && this.buttons[index]) {
 			this.index = expanded ? index : null;
-			// @ts-ignore
+
 			this.buttons[index].setAttribute('aria-expanded', expanded.toString());
 
-			// @ts-ignore
 			toggleMenu(this.children[index], expanded);
 		}
 	}
