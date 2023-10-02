@@ -1,5 +1,5 @@
-
 import keyboardNavigation from '@19h47/keyboard-navigation';
+
 
 /**
  * Toggle Menu
@@ -112,7 +112,7 @@ class DisclosureMenu {
 	 *
 	 * @returns
 	 */
-	onButtonKeydown(event: KeyboardEvent): boolean | void {
+	onButtonKeydown(event: KeyboardEvent): boolean | number | void {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
 
@@ -141,7 +141,7 @@ class DisclosureMenu {
 	 *
 	 * @returns
 	 */
-	onMenuKeydown(event: KeyboardEvent): boolean | void {
+	onMenuKeydown(event: KeyboardEvent): boolean | number | void {
 		if (null === this.index) {
 			return true;
 		}
