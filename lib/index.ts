@@ -84,8 +84,7 @@ class DisclosureMenu {
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
 
-		// @ts-ignore
-		if (!this.el.contains(relatedTarget)) {
+		if (!this.el.contains(relatedTarget as Node)) {
 			this.toggle(this.index as number, false);
 		}
 	}
@@ -102,8 +101,6 @@ class DisclosureMenu {
 		const index = this.buttons.indexOf(target);
 		// @ts-ignore
 		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
-
-		// console.log('click',index, expanded);
 
 		this.toggle(index, !expanded);
 	}
