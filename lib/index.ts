@@ -103,7 +103,7 @@ class DisclosureMenu {
 		// @ts-ignore
 		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
 
-		console.log('click',index, expanded);
+		// console.log('click',index, expanded);
 
 		this.toggle(index, !expanded);
 	}
@@ -171,11 +171,11 @@ class DisclosureMenu {
 	 * @param {boolean} expanded
 	 */
 	toggle(index: number | null, expanded: boolean): void {
-		console.log('toggle', this.index, index, expanded);
+		// console.log('toggle', this.index, index, expanded);
 
 		// Close open menu, if applicable
 		if (this.index !== index) {
-			console.log('close');
+			// console.log('close');
 			this.toggle(this.index as number, false);
 		}
 
