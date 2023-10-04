@@ -1,4 +1,4 @@
-const plugins = ['@babel'];
+const plugins = [];
 
 const settings = {
 	'import/resolver': {

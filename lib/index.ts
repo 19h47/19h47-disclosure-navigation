@@ -1,23 +1,20 @@
 import keyboardNavigation from '@19h47/keyboard-navigation';
 
-
 /**
  * Toggle Menu
  *
- * @param {HTMLElement} domNode
+ * @param {HTMLElement} el HTML element.
  * @param {boolean} show
  *
  * @returns
  */
-const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
+const toggleMenu = (el: HTMLElement, show: boolean): void | string => {
 	if (show) {
-		return domNode?.style.removeProperty('display');
+		return el.style.removeProperty('display');
 	}
 
-	return domNode?.style.setProperty('display', 'none');
+	return el.style.setProperty('display', 'none');
 };
-
-// TODO: Remove ts-ignore
 
 /**
  * Disclosure Menu
@@ -27,9 +24,9 @@ const toggleMenu = (domNode: HTMLElement, show: boolean): string | void => {
 class DisclosureMenu {
 	el: HTMLElement;
 	buttons: HTMLButtonElement[] | [];
-	children: HTMLElement[];
-	index: number | null;
-	useArrowKeys: boolean;
+	children: HTMLElement[] = [];
+	index: number | null = null;
+	useArrowKeys: boolean = true;
 
 	/**
 	 * Constructor
@@ -38,16 +35,16 @@ class DisclosureMenu {
 	 */
 	constructor(el: HTMLElement) {
 		this.el = el;
-		this.buttons = [...this.el.querySelectorAll('button[aria-expanded][aria-controls]')] as HTMLButtonElement[];
-		this.children = [];
-		this.index = null;
-		this.useArrowKeys = true;
+
+		this.buttons = [
+			...this.el.querySelectorAll('button[aria-expanded][aria-controls]'),
+		] as HTMLButtonElement[];
 	}
 
 	/**
 	 * Init
 	 */
-	init() {
+	init(): void {
 		this.buttons.forEach($button => {
 			const id = $button.getAttribute('aria-controls');
 			const $child = this.el.querySelector<HTMLElement>(`#${id}`);
@@ -63,9 +60,9 @@ class DisclosureMenu {
 
 				// Attach event listeners
 
-				$child.addEventListener('keydown', (e: KeyboardEvent) => this.onMenuKeydown(e));
-				$button.addEventListener('click', (e: MouseEvent) => this.onButtonClick(e));
-				$button.addEventListener('keydown', (e: KeyboardEvent) => this.onButtonKeydown(e));
+				$child.addEventListener('keydown', this.onMenuKeydown);
+				$button.addEventListener('click', this.onButtonClick);
+				$button.addEventListener('keydown', this.onButtonKeydown);
 			}
 		});
 
@@ -94,16 +91,15 @@ class DisclosureMenu {
 	 *
 	 * @param {MouseEvent} event
 	 */
-	onButtonClick(event: MouseEvent): void {
+	onButtonClick = (event: MouseEvent): void => {
 		const { target } = event;
 
-		// @ts-ignore
-		const index = this.buttons.indexOf(target);
-		// @ts-ignore
-		const expanded = true === JSON.parse(target.getAttribute('aria-expanded'));
+		const index = this.buttons.indexOf(target as never);
+		const expanded =
+			true === JSON.parse((target as HTMLElement).getAttribute('aria-expanded') || 'false');
 
 		this.toggle(index, !expanded);
-	}
+	};
 
 	/**
 	 * On Button Keydown
@@ -112,7 +108,7 @@ class DisclosureMenu {
 	 *
 	 * @returns
 	 */
-	onButtonKeydown(event: KeyboardEvent): boolean | number | void {
+	onButtonKeydown(event: KeyboardEvent): any {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
 
@@ -141,7 +137,7 @@ class DisclosureMenu {
 	 *
 	 * @returns
 	 */
-	onMenuKeydown(event: KeyboardEvent): boolean | number | void {
+	onMenuKeydown = (event: KeyboardEvent): any => {
 		if (null === this.index) {
 			return true;
 		}
@@ -159,7 +155,7 @@ class DisclosureMenu {
 
 		// Handle arrow key navigation within menu links, if set
 		return this.useArrowKeys && keyboardNavigation(event, links, index);
-	}
+	};
 
 	/**
 	 * Toggle
