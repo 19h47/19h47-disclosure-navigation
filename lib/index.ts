@@ -108,7 +108,7 @@ class DisclosureMenu {
 	 *
 	 * @returns
 	 */
-	onButtonKeydown(event: KeyboardEvent): any {
+	onButtonKeydown = (event: KeyboardEvent): any => {
 		const { key } = event;
 		const index = this.buttons.indexOf(document.activeElement as never);
 
