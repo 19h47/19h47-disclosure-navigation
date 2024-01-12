@@ -92,11 +92,12 @@ class DisclosureMenu {
 	 * @param {MouseEvent} event
 	 */
 	onButtonClick = (event: MouseEvent): void => {
-		const { target } = event;
+		const { currentTarget } = event;
 
-		const index = this.buttons.indexOf(target as never);
-		const expanded =
-			true === JSON.parse((target as HTMLElement).getAttribute('aria-expanded') || 'false');
+		const index = this.buttons.indexOf(currentTarget as never);
+		const expanded = JSON.parse(
+			(currentTarget as HTMLElement).getAttribute('aria-expanded') || 'false',
+		);
 
 		this.toggle(index, !expanded);
 	};
@@ -128,7 +129,7 @@ class DisclosureMenu {
 
 		// Handle arrow key navigation between top-level buttons, if set
 		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
-	}
+	};
 
 	/**
 	 * On Menu Keydown
