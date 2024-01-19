@@ -124,6 +124,9 @@ disclosureMenu.init();</code></pre>
 			const disclosureMenu = new DisclosureMenu.default($element);
 
 			disclosureMenu.init();
+
+			disclosureMenu.el.addEventListener('disclosure-menu:open', ({ detail }) => console.log('open', detail))
+			disclosureMenu.el.addEventListener('disclosure-menu:close', ({ detail }) => console.log('close', detail))
 		</script>
 	</body>
 </html>

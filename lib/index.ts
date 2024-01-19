@@ -1,4 +1,5 @@
 import keyboardNavigation from '@19h47/keyboard-navigation';
+import { dispatchEvent } from './utils';
 
 /**
  * Toggle Menu
@@ -180,6 +181,12 @@ class DisclosureMenu {
 			this.buttons[index].setAttribute('aria-expanded', expanded.toString());
 
 			toggleMenu(this.children[index], expanded);
+
+			dispatchEvent(
+				this.el,
+				{ index, button: this.buttons[index], child: this.children[index] },
+				expanded ? 'open' : 'close',
+			);
 		}
 	}
 
