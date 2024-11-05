@@ -6,7 +6,7 @@
  * @param {string} name
  */
 export const dispatchEvent = (target: HTMLElement, details: object = {}, name: string = ''): boolean => {
-	const event = new CustomEvent(`disclosure-menu:${name}`, {
+	const event = new CustomEvent(`disclosure-navigation:${name}`, {
 		bubbles: false,
 		cancelable: true,
 		detail: details,

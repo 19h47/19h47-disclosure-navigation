@@ -1,6 +1,6 @@
 {
-	"name": "@19h47/disclosure-menu",
-	"version": "1.1.0",
+	"name": "@19h47/disclosure-navigation",
+	"version": "2.0.0",
 	"description": "",
 	"keywords": [
 		"disclosure",
@@ -10,13 +10,13 @@
 		"ES6",
 		"TypeScript"
 	],
-	"homepage": "https://github.com/19h47/19h47-disclosure-menu#readme",
+	"homepage": "https://github.com/19h47/19h47-disclosure-navigation#readme",
 	"bugs": {
-		"url": "https://github.com/19h47/19h47-disclosure-menu/issues"
+		"url": "https://github.com/19h47/19h47-disclosure-navigation/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/19h47/19h47-disclosure-menu.git"
+		"url": "git://github.com/19h47/19h47-disclosure-navigation.git"
 	},
 	"license": "ISC",
 	"author": "Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)",
@@ -36,20 +36,20 @@
 	"devDependencies": {
 		"@19h47/prettier-config": "19h47/prettier-config",
 		"clean-webpack-plugin": "^4.0.0",
-		"eslint": "^8.56.0",
+		"eslint": "^9.6.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-import-resolver-webpack": "^0.13.8",
 		"eslint-plugin-import": "^2.29.1",
-		"eslint-webpack-plugin": "^4.0.1",
+		"eslint-webpack-plugin": "^4.2.0",
 		"html-webpack-plugin": "5.6.0",
-		"prettier": "^3.2.4",
+		"prettier": "^3.3.2",
 		"ts-loader": "9.5.1",
-		"typescript": "^5.3.3",
-		"webpack": "5.89.0",
+		"typescript": "^5.5.3",
+		"webpack": "5.92.1",
 		"webpack-cli": "^5.1.4",
-		"webpack-dev-server": "4.15.1",
-		"webpack-merge": "^5.10.0",
+		"webpack-dev-server": "5.0.4",
+		"webpack-merge": "^6.0.1",
 		"webpack-notifier": "^1.15.0"
 	}
 }

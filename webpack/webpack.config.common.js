@@ -1,7 +1,7 @@
 /**
  *
  * @file webpack.config.common.js
- * @author Jérémy Levron <jeremylevron@19h47.fr> (http://19h47.fr)
+ * @author Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)
  */
 
 // Plugins
@@ -20,7 +20,7 @@ module.exports = {
 		docs: resolve('lib/index.ts'),
 	},
 	output: {
-		library: 'DisclosureMenu',
+		library: 'DisclosureNavigation',
 		libraryTarget: 'umd',
 		filename: '../[name]/main.js',
 		path: path.resolve(process.cwd(), 'dist'),

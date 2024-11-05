@@ -20,9 +20,9 @@ const toggleMenu = (el: HTMLElement, show: boolean): void | string => {
 /**
  * Disclosure Menu
  *
- * @see https://www.w3.org/WAI/content-assets/wai-aria-practices/patterns/disclosure/examples/js/disclosureMenu.js
+ * @see https://www.w3.org/WAI/content-assets/wai-aria-practices/patterns/disclosure/examples/js/disclosureNavigation.js
  */
-class DisclosureMenu {
+class DisclosureNavigation {
 	el: HTMLElement;
 	buttons: HTMLButtonElement[] | [];
 	children: HTMLElement[] = [];
@@ -81,6 +81,7 @@ class DisclosureMenu {
 	 */
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
+		console.log('DisclosureNaviation.onBlur', relatedTarget);
 
 		if (!this.el.contains(relatedTarget as Node)) {
 			this.toggle(this.index as number, false);
@@ -195,4 +196,4 @@ class DisclosureMenu {
 	// }
 }
 
-export default DisclosureMenu;
+export default DisclosureNavigation;
