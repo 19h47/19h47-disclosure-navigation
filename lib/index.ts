@@ -9,12 +9,12 @@ import { dispatchEvent } from './utils';
  *
  * @returns
  */
-const toggleMenu = (el: HTMLElement, show: boolean): void | string => {
+const toggleMenu = (el: HTMLElement, show: boolean): void => {
 	if (show) {
-		return el.style.removeProperty('display');
+		el.style.removeProperty('display');
+	} else {
+		el.style.setProperty('display', 'none');
 	}
-
-	return el.style.setProperty('display', 'none');
 };
 
 /**
@@ -24,7 +24,7 @@ const toggleMenu = (el: HTMLElement, show: boolean): void | string => {
  */
 class DisclosureNavigation {
 	el: HTMLElement;
-	buttons: HTMLButtonElement[] | [];
+	buttons: HTMLButtonElement[];
 	children: HTMLElement[] = [];
 	index: number | null = null;
 	useArrowKeys: boolean = true;
@@ -42,24 +42,17 @@ class DisclosureNavigation {
 		] as HTMLButtonElement[];
 	}
 
-	/**
-	 * Init
-	 */
+	// Add mouseout event listener in init
 	init(): void {
 		this.buttons.forEach($button => {
 			const id = $button.getAttribute('aria-controls');
 			const $child = this.el.querySelector<HTMLElement>(`#${id}`);
 
 			if ($child) {
-				// save ref controlled menu
-
 				this.children.push($child);
 
-				// Collapse menus
 				$button.setAttribute('aria-expanded', 'false');
 				toggleMenu($child, false);
-
-				// Attach event listeners
 
 				$child.addEventListener('keydown', this.onMenuKeydown);
 				$button.addEventListener('click', this.onButtonClick);
@@ -81,7 +74,12 @@ class DisclosureNavigation {
 	 */
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
-		console.log('DisclosureNaviation.onBlur', relatedTarget);
+		console.log(
+			'DisclosureNaviation.onBlur',
+			this.el,
+			relatedTarget,
+			!this.el.contains(relatedTarget as Node),
+		);
 
 		if (!this.el.contains(relatedTarget as Node)) {
 			this.toggle(this.index as number, false);
@@ -146,8 +144,12 @@ class DisclosureNavigation {
 		}
 
 		const { key } = event;
-		const links = [...this.children[this.index]?.querySelectorAll('a')];
-		const index = links?.indexOf(document.activeElement as HTMLAnchorElement);
+		const links = [
+			...this.children[this.index]?.querySelectorAll(
+				'a, button, [tabindex]:not([tabindex="-1"])',
+			),
+		];
+		const index = links.findIndex(link => link === document.activeElement);
 
 		// Close on escape
 		if ('Escape' === key) {
@@ -167,7 +169,7 @@ class DisclosureNavigation {
 	 * @param {boolean} expanded
 	 */
 	toggle(index: number | null, expanded: boolean): void {
-		// console.log('toggle', this.index, index, expanded);
+		console.log('toggle', this.index, index, expanded);
 
 		// Close open menu, if applicable
 		if (this.index !== index) {
