@@ -1,7 +1,7 @@
 {
 	"name": "@19h47/disclosure-navigation",
-	"version": "2.0.0",
-	"description": "",
+	"version": "3.0.0",
+	"description": "Disclosure navigation",
 	"keywords": [
 		"disclosure",
 		"navigation",
@@ -20,36 +20,24 @@
 	},
 	"license": "ISC",
 	"author": "Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)",
+	"type": "module",
 	"main": "./dist/main.js",
+	"directories": {
+		"doc": "docs",
+		"lib": "lib"
+	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
 		"deploy": "npm login && npm run build && npm publish",
-		"dev": "webpack --mode=development --config webpack/webpack.config.js",
-		"build": "webpack --mode=production --config webpack/webpack.config.js",
-		"serve": "webpack-dev-server --mode=development --hot --config webpack/webpack.config.js"
+		"dev": "vite",
+		"build": "vite build"
 	},
 	"dependencies": {
 		"@19h47/keyboard-navigation": "^1.0.2"
 	},
 	"devDependencies": {
-		"@19h47/prettier-config": "19h47/prettier-config",
-		"clean-webpack-plugin": "^4.0.0",
-		"eslint": "^9.36.0",
-		"eslint-config-airbnb-base": "^15.0.0",
-		"eslint-config-prettier": "^10.1.8",
-		"eslint-import-resolver-webpack": "^0.13.10",
-		"eslint-plugin-import": "^2.32.0",
-		"eslint-webpack-plugin": "^5.0.2",
-		"html-webpack-plugin": "5.6.4",
-		"prettier": "^3.6.2",
-		"ts-loader": "9.5.4",
-		"typescript": "^5.9.2",
-		"webpack": "5.101.3",
-		"webpack-cli": "^6.0.1",
-		"webpack-dev-server": "5.2.2",
-		"webpack-merge": "^6.0.1",
-		"webpack-notifier": "^1.15.0"
+		"vite": "^6.3.4"
 	}
 }

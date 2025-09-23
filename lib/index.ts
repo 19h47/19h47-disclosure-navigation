@@ -18,9 +18,49 @@ const toggleMenu = (el: HTMLElement, show: boolean): void => {
 };
 
 /**
+ * Set tabindex for all focusable elements inside a menu
+ *
+ * @param {HTMLElement} menu
+ * @param {boolean} enabled
+ */
+const setMenuTabIndex = (menu: HTMLElement, enabled: boolean): void => {
+	const focusables = menu.querySelectorAll<HTMLElement>(
+		'a, button, [tabindex]:not([tabindex="-1"])'
+	);
+	focusables.forEach(el => {
+		if (enabled) {
+			el.removeAttribute('tabindex');
+		} else {
+			el.setAttribute('tabindex', '-1');
+		}
+	});
+};
+
+/**
  * Disclosure Menu
  *
  * @see https://www.w3.org/WAI/content-assets/wai-aria-practices/patterns/disclosure/examples/js/disclosureNavigation.js
+ *
+ * A class to manage accessible disclosure navigation menus.
+ *
+ * This class handles the initialization, keyboard and mouse interactions,
+ * and ARIA attributes for a navigation menu with expandable/collapsible submenus.
+ * It supports keyboard navigation (arrow keys, Escape), focus management,
+ * and custom event dispatching for open/close actions.
+ *
+ * @example
+ * ```typescript
+ * const nav = document.querySelector('.nav');
+ * const disclosureNav = new DisclosureNavigation(nav);
+ * disclosureNav.init();
+ * ```
+ *
+ * @remarks
+ * - The navigation container should contain buttons with `aria-expanded` and `aria-controls` attributes.
+ * - Each button's `aria-controls` should reference the ID(s) of the controlled submenu(s).
+ * - The class manages ARIA attributes, event listeners, and focus for accessibility.
+ *
+ * @public
  */
 class DisclosureNavigation {
 	el: HTMLElement;
@@ -29,11 +69,6 @@ class DisclosureNavigation {
 	index: number | null = null;
 	useArrowKeys: boolean = true;
 
-	/**
-	 * Constructor
-	 *
-	 * @param {HTMLElement} el
-	 */
 	constructor(el: HTMLElement) {
 		this.el = el;
 
@@ -42,78 +77,55 @@ class DisclosureNavigation {
 		] as HTMLButtonElement[];
 	}
 
-	// Add mouseout event listener in init
 	init(): void {
+		this.children = [];
 		this.buttons.forEach($button => {
-			const id = $button.getAttribute('aria-controls');
-			const $child = this.el.querySelector<HTMLElement>(`#${id}`);
+			const ids = ($button.getAttribute('aria-controls') || '').split(' ');
+			for (const id of ids) {
+				const $child = this.el.querySelector<HTMLElement>(`#${id}`);
 
-			if ($child) {
-				this.children.push($child);
+				if ($child) {
+					this.children.push($child);
 
-				$button.setAttribute('aria-expanded', 'false');
-				toggleMenu($child, false);
+					$button.setAttribute('aria-expanded', 'false');
+					toggleMenu($child, false);
+					setMenuTabIndex($child, false); // Make menu items untabbable by default
 
-				$child.addEventListener('keydown', this.onMenuKeydown);
-				$button.addEventListener('click', this.onButtonClick);
-				$button.addEventListener('keydown', this.onButtonKeydown);
+					$child.addEventListener('keydown', this.handleKeydown);
+					$button.addEventListener('click', this.handleButtonClick);
+					$button.addEventListener('keydown', this.handleButtonKeydown);
+				}
 			}
 		});
 
-		this.el.addEventListener('focusout', (e: FocusEvent) => this.onBlur(e));
+		this.el.addEventListener('focusout', this.handleFocusOut);
 	}
 
-	// close(): void {
-	// 	this.toggle(this.index, false);
-	// }
+	handleFocusOut = (event: FocusEvent): void => {
+		this.onBlur(event);
+	};
 
-	/**
-	 * On Blur
-	 *
-	 * @param {FocusEvent} event
-	 */
 	onBlur(event: FocusEvent): void {
 		const { relatedTarget } = event;
-		console.log(
-			'DisclosureNaviation.onBlur',
-			this.el,
-			relatedTarget,
-			!this.el.contains(relatedTarget as Node),
-		);
 
 		if (!this.el.contains(relatedTarget as Node)) {
 			this.toggle(this.index as number, false);
 		}
 	}
 
-	/**
-	 * On Button Click
-	 *
-	 * @param {MouseEvent} event
-	 */
-	onButtonClick = (event: MouseEvent): void => {
+	handleButtonClick = (event: MouseEvent): void => {
 		const { currentTarget } = event;
+		const index = this.buttons.indexOf(currentTarget as HTMLButtonElement);
 
-		const index = this.buttons.indexOf(currentTarget as never);
-		const expanded = JSON.parse(
-			(currentTarget as HTMLElement).getAttribute('aria-expanded') || 'false',
-		);
+		const expanded =
+			(currentTarget as HTMLElement).getAttribute('aria-expanded') === 'true';
 
 		this.toggle(index, !expanded);
 	};
 
-	/**
-	 * On Button Keydown
-	 *
-	 * @param {KeyboardEvent} event
-	 *
-	 * @returns
-	 */
-	onButtonKeydown = (event: KeyboardEvent): any => {
+	handleButtonKeydown = (event: KeyboardEvent): number | boolean | void => {
 		const { key } = event;
-		const index = this.buttons.indexOf(document.activeElement as never);
-
-		// console.log('onButtonKeydown', key);
+		const index = this.buttons.indexOf(document.activeElement as HTMLButtonElement);
 
 		// Close on escape
 		if ('Escape' === key) {
@@ -131,14 +143,7 @@ class DisclosureNavigation {
 		return this.useArrowKeys && keyboardNavigation(event, this.buttons, index);
 	};
 
-	/**
-	 * On Menu Keydown
-	 *
-	 * @param {KeyboardEvent} event
-	 *
-	 * @returns
-	 */
-	onMenuKeydown = (event: KeyboardEvent): any => {
+	handleKeydown = (event: KeyboardEvent): number | boolean | void => {
 		if (null === this.index) {
 			return true;
 		}
@@ -169,21 +174,27 @@ class DisclosureNavigation {
 	 * @param {boolean} expanded
 	 */
 	toggle(index: number | null, expanded: boolean): void {
-		console.log('toggle', this.index, index, expanded);
-
 		// Close open menu, if applicable
-		if (this.index !== index) {
-			// console.log('close');
-			this.toggle(this.index as number, false);
+		if (this.index !== index && this.index !== null) {
+			const prevIndex = this.index;
+			this.index = null;
+			if (prevIndex !== null && this.buttons[prevIndex]) {
+				this.buttons[prevIndex].setAttribute('aria-expanded', 'false');
+				toggleMenu(this.children[prevIndex], false);
+				setMenuTabIndex(this.children[prevIndex], false); // Make previous menu untabbable
+				dispatchEvent(
+					this.el,
+					{ index: prevIndex, button: this.buttons[prevIndex], child: this.children[prevIndex] },
+					'close',
+				);
+			}
 		}
 
 		// Handle menu at called index
-		if (index !== null && this.buttons[index]) {
-			this.index = expanded ? index : null;
-
-			this.buttons[index].setAttribute('aria-expanded', expanded.toString());
-
+		if (index !== null && this.children[index]) {
+			this.buttons[index].setAttribute('aria-expanded', expanded ? 'true' : 'false');
 			toggleMenu(this.children[index], expanded);
+			setMenuTabIndex(this.children[index], expanded); // Only open menu is tabbable
 
 			dispatchEvent(
 				this.el,
@@ -191,11 +202,26 @@ class DisclosureNavigation {
 				expanded ? 'open' : 'close',
 			);
 		}
+
+		this.index = expanded ? index : null;
 	}
 
-	// updateKeyControls(useArrowKeys: boolean): void {
-	// 	this.useArrowKeys = useArrowKeys;
-	// }
+	destroy(): void {
+		this.buttons.forEach(($button, i) => {
+			const ids = ($button.getAttribute('aria-controls') || '').split(' ');
+			for (const id of ids) {
+				const $child = this.el.querySelector<HTMLElement>(`#${id}`);
+				if ($child) {
+					$child.removeEventListener('keydown', this.handleKeydown);
+				}
+			}
+			$button.removeEventListener('click', this.handleButtonClick);
+			$button.removeEventListener('keydown', this.handleButtonKeydown);
+		});
+		this.el.removeEventListener('focusout', this.handleFocusOut);
+		this.children = [];
+		this.index = null;
+	}
 }
 
 export default DisclosureNavigation;
