@@ -1,6 +1,6 @@
 {
 	"name": "@19h47/disclosure-navigation",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Disclosure navigation",
 	"keywords": [
 		"disclosure",
@@ -21,7 +21,8 @@
 	"license": "ISC",
 	"author": "Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)",
 	"type": "module",
-	"main": "./dist/main.js",
+	"main": "./dist/disclosure-navigation.umd.cjs",
+	"module": "./dist/disclosure-navigation.js",
 	"directories": {
 		"doc": "docs",
 		"lib": "lib"
