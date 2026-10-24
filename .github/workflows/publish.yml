@@ -1,0 +1,32 @@
+name: Publish
+
+# Trusted publishing: npm authenticates this workflow with OIDC, no token to store,
+# and adds a provenance attestation. Configure it once on npmjs.com, in the package
+# settings: GitHub Actions, repository 19h47/19h47-disclosure-navigation, workflow publish.yml.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      # Node 24 ships npm 11.5.1 or later, required for trusted publishing
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: npm publish

@@ -1,14 +1,16 @@
 {
 	"name": "@19h47/disclosure-navigation",
-	"version": "3.0.1",
-	"description": "Disclosure navigation",
+	"version": "4.0.0",
+	"description": "Accessible WAI-ARIA disclosure navigation, enhancing the markup you write.",
 	"keywords": [
 		"disclosure",
 		"navigation",
 		"nav",
 		"menu",
-		"ES6",
-		"TypeScript"
+		"accessibility",
+		"a11y",
+		"wai-aria",
+		"apg"
 	],
 	"homepage": "https://github.com/19h47/19h47-disclosure-navigation#readme",
 	"bugs": {
@@ -16,29 +18,44 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/19h47/19h47-disclosure-navigation.git"
+		"url": "git+https://github.com/19h47/19h47-disclosure-navigation.git"
 	},
-	"license": "ISC",
+	"license": "MIT",
 	"author": "Jérémy Levron <jeremylevron@19h47.fr> (https://19h47.fr)",
 	"type": "module",
-	"main": "./dist/disclosure-navigation.umd.cjs",
-	"module": "./dist/disclosure-navigation.js",
-	"directories": {
-		"doc": "docs",
-		"lib": "lib"
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
 	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"files": [
 		"dist"
 	],
+	"sideEffects": false,
 	"scripts": {
-		"deploy": "npm login && npm run build && npm publish",
 		"dev": "vite",
-		"build": "vite build"
-	},
-	"dependencies": {
-		"@19h47/keyboard-navigation": "^1.0.2"
+		"build": "vite build",
+		"build:docs": "vite build --mode docs",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
-		"vite": "^6.3.4"
-	}
+		"@vitest/browser-playwright": "^5.0.5",
+		"bootstrap": "^5.3.8",
+		"playwright": "^1.64.1",
+		"prismjs": "^1.30.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.3.5",
+		"vite-plugin-dts": "^5.1.2",
+		"vitest": "^5.0.5"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"packageManager": "pnpm@10.33.2"
 }
