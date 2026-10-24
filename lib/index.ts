@@ -11,8 +11,8 @@ const controlledElements = ($button: HTMLButtonElement): HTMLElement[] =>
 	($button.ariaControlsElements ?? []) as HTMLElement[];
 
 const menuItems = ($button: HTMLButtonElement): HTMLElement[] =>
-	controlledElements($button).flatMap(element => [
-		...element.querySelectorAll<HTMLElement>(MENU_ITEMS),
+	controlledElements($button).flatMap($element => [
+		...$element.querySelectorAll<HTMLElement>(MENU_ITEMS),
 	]);
 
 /**
@@ -28,35 +28,34 @@ const menuItems = ($button: HTMLButtonElement): HTMLElement[] =>
  *
  * @example
  * ```typescript
- * const nav = document.querySelector('.nav');
- * const disclosureNavigation = new DisclosureNavigation(nav);
+ * const $nav = document.querySelector('.nav');
+ * const disclosureNavigation = new DisclosureNavigation($nav);
  * disclosureNavigation.init();
  * ```
  */
 class DisclosureNavigation {
-	el: HTMLElement;
+	$el: HTMLElement;
 	useArrowKeys = true;
 	#controller: AbortController | null = null;
 
-	constructor(el: HTMLElement) {
-		this.el = el;
+	constructor($el: HTMLElement) {
+		this.$el = $el;
 	}
 
+	/** Listens to the navigation. Call `destroy()` before calling it again. */
 	init(): void {
-		this.destroy();
 		this.#controller = new AbortController();
 
 		const { signal } = this.#controller;
 
-		this.el.addEventListener('click', this.#handleClick, { signal });
-		this.el.addEventListener('keydown', this.#handleKeydown, { signal });
-		this.el.addEventListener('focusout', this.#handleFocusout, { signal });
+		this.$el.addEventListener('click', this.#handleClick, { signal });
+		this.$el.addEventListener('keydown', this.#handleKeydown, { signal });
+		this.$el.addEventListener('focusout', this.#handleFocusout, { signal });
 	}
 
 	/** Removes the listeners. The markup stays in its current state. */
 	destroy(): void {
 		this.#controller?.abort();
-		this.#controller = null;
 	}
 
 	/** Opens the submenu of `$button`, after closing the one already open. */
@@ -72,21 +71,21 @@ class DisclosureNavigation {
 
 	/** Closes the submenu of `$button`, or every open submenu. */
 	close($button?: HTMLButtonElement): void {
-		const $buttons = $button ? [$button] : this.#expandedButtons;
+		const buttons = $button ? [$button] : this.#expandedButtons;
 
-		$buttons.forEach($expanded => this.#expand($expanded, false));
+		buttons.forEach($expanded => this.#expand($expanded, false));
 	}
 
 	toggle($button: HTMLButtonElement): void {
 		if (isExpanded($button)) {
-			this.close($button);
-		} else {
-			this.open($button);
+			return this.close($button);
 		}
+
+		return this.open($button);
 	}
 
 	get #buttons(): HTMLButtonElement[] {
-		return [...this.el.querySelectorAll<HTMLButtonElement>(BUTTONS)];
+		return [...this.$el.querySelectorAll<HTMLButtonElement>(BUTTONS)];
 	}
 
 	get #expandedButtons(): HTMLButtonElement[] {
@@ -97,8 +96,8 @@ class DisclosureNavigation {
 	get #topLevelItems(): HTMLElement[] {
 		const elements = this.#buttons.flatMap(controlledElements);
 
-		return [...this.el.querySelectorAll<HTMLElement>(TOP_LEVEL_ITEMS)].filter(
-			item => !elements.some(element => element.contains(item)),
+		return [...this.$el.querySelectorAll<HTMLElement>(TOP_LEVEL_ITEMS)].filter(
+			$item => !elements.some($element => $element.contains($item)),
 		);
 	}
 
@@ -123,8 +122,8 @@ class DisclosureNavigation {
 		}
 
 		$button.ariaExpanded = expanded.toString();
-		elements.forEach(element => {
-			element.hidden = !expanded;
+		elements.forEach($element => {
+			$element.hidden = !expanded;
 		});
 
 		return true;
@@ -133,43 +132,41 @@ class DisclosureNavigation {
 	#handleClick = (event: MouseEvent): void => {
 		const $button = (event.target as Element).closest<HTMLButtonElement>(BUTTONS);
 
-		if ($button && this.el.contains($button)) {
+		if ($button && this.$el.contains($button)) {
 			this.toggle($button);
 		}
 	};
 
-	#handleFocusout = ({ relatedTarget }: FocusEvent): void => {
-		if (!this.el.contains(relatedTarget as Node | null)) {
+	#handleFocusout = (event: FocusEvent): void => {
+		if (!this.$el.contains(event.relatedTarget as Node | null)) {
 			this.close();
 		}
 	};
 
 	#handleKeydown = (event: KeyboardEvent): void => {
-		const target = event.target as HTMLElement;
+		const $target = event.target as HTMLElement;
 		const $button = this.#expandedButtons.find($expanded =>
-			controlledElements($expanded).some(element => element.contains(target)),
+			controlledElements($expanded).some($element => $element.contains($target)),
 		);
 
 		if ($button) {
-			this.#handleMenuKeydown(event, $button);
-		} else {
-			this.#handleTopLevelKeydown(event);
+			return this.#handleMenuKeydown(event, $button);
 		}
+
+		return this.#handleTopLevelKeydown(event);
 	};
 
 	#handleTopLevelKeydown(event: KeyboardEvent): void {
 		const items = this.#topLevelItems;
-		const target = event.target as HTMLElement;
-		const index = items.indexOf(target);
+		const $target = event.target as HTMLElement;
+		const index = items.indexOf($target);
 
 		if (index === -1) {
 			return;
 		}
 
 		if ('Escape' === event.key) {
-			this.close();
-
-			return;
+			return this.close();
 		}
 
 		if (!this.useArrowKeys) {
@@ -177,22 +174,20 @@ class DisclosureNavigation {
 		}
 
 		// Move focus into the submenu of an expanded button
-		if ('ArrowDown' === event.key && target instanceof HTMLButtonElement && isExpanded(target)) {
+		if ('ArrowDown' === event.key && $target instanceof HTMLButtonElement && isExpanded($target)) {
 			event.preventDefault();
-			menuItems(target)[0]?.focus();
 
-			return;
+			return menuItems($target)[0]?.focus();
 		}
 
-		focusByKey(event, items, index);
+		return focusByKey(event, items, index);
 	}
 
 	#handleMenuKeydown(event: KeyboardEvent, $button: HTMLButtonElement): void {
 		if ('Escape' === event.key) {
 			$button.focus();
-			this.close($button);
 
-			return;
+			return this.close($button);
 		}
 
 		if (!this.useArrowKeys) {

@@ -715,18 +715,22 @@ disclosureNavigation.init();</code></pre>
 						</thead>
 						<tbody>
 							<tr>
-								<td><code>new DisclosureNavigation(el)</code></td>
+								<td><code>new DisclosureNavigation($nav)</code></td>
 								<td>
-									<code>el</code> is the navigation. Buttons are found inside it with
+									<code>$nav</code> is the navigation. Buttons are found inside it with
 									<code>button[aria-expanded][aria-controls]</code>.
 								</td>
+							</tr>
+							<tr>
+								<td><code>$el</code></td>
+								<td>The navigation passed to the constructor.</td>
 							</tr>
 							<tr>
 								<td><code>init()</code></td>
 								<td>
 									Listens to <code>click</code>, <code>keydown</code> and
-									<code>focusout</code> on <code>el</code>. Calling it again rebinds
-									once.
+									<code>focusout</code> on <code>$nav</code>. Call
+									<code>destroy()</code> before calling it again.
 								</td>
 							</tr>
 							<tr>
@@ -757,8 +761,8 @@ disclosureNavigation.init();</code></pre>
 					needs no call. Closing the submenu once a link is followed is up to you, as in
 					the header of this page:
 				</p>
-				<pre><code class="language-javascript">disclosureNavigation.el.addEventListener('click', ({ target }) => {
-	if (target.closest('a')) {
+				<pre><code class="language-javascript">$nav.addEventListener('click', event => {
+	if (event.target.closest('a')) {
 		disclosureNavigation.close();
 	}
 });</code></pre>
@@ -793,13 +797,14 @@ disclosureNavigation.init();</code></pre>
 			import DisclosureNavigation from './lib/index.ts';
 
 			// Header: the documentation's own navigation
-			const header = new DisclosureNavigation(document.getElementById('header-nav'));
+			const $header = document.getElementById('header-nav');
+			const header = new DisclosureNavigation($header);
 
 			header.init();
 
 			// Closing after a link is followed is the consumer's call
-			header.el.addEventListener('click', ({ target }) => {
-				if (target.closest('a')) {
+			$header.addEventListener('click', event => {
+				if (event.target.closest('a')) {
 					header.close();
 				}
 			});
@@ -808,7 +813,8 @@ disclosureNavigation.init();</code></pre>
 			new DisclosureNavigation(document.getElementById('sidebar-nav')).init();
 
 			// Playground
-			const playground = new DisclosureNavigation(document.getElementById('playground-nav'));
+			const $playground = document.getElementById('playground-nav');
+			const playground = new DisclosureNavigation($playground);
 			const $about = document.getElementById('playground-about');
 			const $services = document.getElementById('playground-services');
 			const $arrowKeys = document.getElementById('playground-arrow-keys');
@@ -834,13 +840,13 @@ disclosureNavigation.init();</code></pre>
 			playground.init();
 
 			// Registered first, so the logger below sees defaultPrevented
-			playground.el.addEventListener('disclosure-navigation:open', event => {
+			$playground.addEventListener('disclosure-navigation:open', event => {
 				if ($lock.checked && event.detail.$button === $services) {
 					event.preventDefault();
 				}
 			});
-			playground.el.addEventListener('disclosure-navigation:open', logEvent);
-			playground.el.addEventListener('disclosure-navigation:close', logEvent);
+			$playground.addEventListener('disclosure-navigation:open', logEvent);
+			$playground.addEventListener('disclosure-navigation:close', logEvent);
 
 			$arrowKeys.addEventListener('change', () => {
 				playground.useArrowKeys = $arrowKeys.checked;
@@ -850,11 +856,12 @@ disclosureNavigation.init();</code></pre>
 			$bound.addEventListener('change', () => {
 				if ($bound.checked) {
 					playground.init();
-					log('init()');
-				} else {
-					playground.destroy();
-					log('destroy()');
+
+					return log('init()');
 				}
+
+				playground.destroy();
+				log('destroy()');
 			});
 
 			document

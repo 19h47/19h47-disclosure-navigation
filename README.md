@@ -105,8 +105,9 @@ or Meta are left to the browser, and so are arrow keys in a text field.
 
 | Member                         | Description                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------------------- |
-| `new DisclosureNavigation(el)` | `el` is the navigation. Buttons are found inside it with `button[aria-expanded][aria-controls]`. |
-| `init()`                       | Listens to `click`, `keydown` and `focusout` on `el`. Calling it again rebinds once.         |
+| `new DisclosureNavigation($nav)` | `$nav` is the navigation. Buttons are found inside it with `button[aria-expanded][aria-controls]`. |
+| `$el`                          | The navigation passed to the constructor.                                                    |
+| `init()`                       | Listens to `click`, `keydown` and `focusout` on `$nav`. Call `destroy()` before calling it again. |
 | `destroy()`                    | Removes the listeners. The markup stays in its current state.                                |
 | `open($button)`                | Closes the open submenu, then opens the one of `$button`.                                    |
 | `close($button?)`              | Closes the submenu of `$button`, or every open submenu.                                      |
@@ -117,8 +118,8 @@ Buttons are read from the DOM on each interaction: adding or removing items need
 call. Closing the submenu once a link is followed is up to you:
 
 ```js
-disclosureNavigation.el.addEventListener('click', ({ target }) => {
-	if (target.closest('a')) {
+$nav.addEventListener('click', event => {
+	if (event.target.closest('a')) {
 		disclosureNavigation.close();
 	}
 });
@@ -192,7 +193,8 @@ Chrome and Edge 135, Firefox 136, Safari 16.4. The package is an ES module.
    ```
 
 6. **Read the state from the DOM.** The public `buttons`, `children` and `index` fields
-   are removed. Query `button[aria-expanded="true"]` in the navigation instead.
+   are removed. Query `button[aria-expanded="true"]` in the navigation instead. `el` is
+   renamed `$el`.
 7. **Import the ES module.** The UMD build (`dist/disclosure-navigation.umd.cjs`) is
    removed. Import `@19h47/disclosure-navigation` with a bundler or as a native module.
 

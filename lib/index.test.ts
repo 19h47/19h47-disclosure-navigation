@@ -29,13 +29,13 @@ const markup = `
 let disclosureNavigation: DisclosureNavigation | null = null;
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string): T => {
-	const element = document.getElementById(id);
+	const $element = document.getElementById(id);
 
-	if (!element) {
+	if (!$element) {
 		throw new Error(`No element with id ${id}`);
 	}
 
-	return element as T;
+	return $element as T;
 };
 
 const mount = (html = markup): DisclosureNavigation => {
@@ -46,8 +46,8 @@ const mount = (html = markup): DisclosureNavigation => {
 	return disclosureNavigation;
 };
 
-const press = async (element: HTMLElement, key: string): Promise<void> => {
-	element.focus();
+const press = async ($element: HTMLElement, key: string): Promise<void> => {
+	$element.focus();
 	await userEvent.keyboard(`{${key}}`);
 };
 
@@ -111,10 +111,12 @@ describe('click', () => {
 
 describe('events', () => {
 	it('fires on the button, bubbles, and runs before the DOM changes', async () => {
-		const { el } = mount();
+		mount();
+
+		const $nav = $('nav');
 		const events: string[] = [];
 
-		el.addEventListener('disclosure-navigation:open', event => {
+		$nav.addEventListener('disclosure-navigation:open', event => {
 			events.push(event.type);
 
 			expect(event.target).toBe($('about'));
@@ -122,7 +124,7 @@ describe('events', () => {
 			expect(event.detail.elements).toEqual([$('about-menu')]);
 			expect($('about-menu').hidden).toBe(true);
 		});
-		el.addEventListener('disclosure-navigation:close', event => {
+		$nav.addEventListener('disclosure-navigation:close', event => {
 			events.push(event.type);
 
 			expect($('about-menu').hidden).toBe(false);
@@ -135,19 +137,23 @@ describe('events', () => {
 	});
 
 	it('cancels the change when a listener calls preventDefault()', async () => {
-		const { el } = mount();
+		mount();
 
-		el.addEventListener('disclosure-navigation:open', event => event.preventDefault());
+		const $nav = $('nav');
+
+		$nav.addEventListener('disclosure-navigation:open', event => event.preventDefault());
 		await userEvent.click($('about'));
 
 		expectExpanded('about', 'about-menu', false);
 	});
 
 	it('keeps the open submenu when its close is canceled', async () => {
-		const { el } = mount();
+		mount();
+
+		const $nav = $('nav');
 
 		await userEvent.click($('about'));
-		el.addEventListener('disclosure-navigation:close', event => event.preventDefault());
+		$nav.addEventListener('disclosure-navigation:close', event => event.preventDefault());
 		await userEvent.click($('services'));
 
 		expectExpanded('about', 'about-menu', true);
@@ -282,15 +288,6 @@ describe('API', () => {
 
 		instance.close();
 		expectExpanded('services', '1-services', false);
-	});
-
-	it('binds the listeners once when init() runs twice', async () => {
-		const instance = mount();
-
-		instance.init();
-		await userEvent.click($('about'));
-
-		expectExpanded('about', 'about-menu', true);
 	});
 
 	it('removes the listeners on destroy() and keeps the markup state', async () => {

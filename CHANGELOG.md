@@ -1,5 +1,12 @@
 # @19h47/disclosure-navigation
 
+## 4.0.1
+
+### Patch Changes
+
+- The public `el` field is renamed `$el`, following the `$` prefix of `$button`. This breaks code that reads `el`: 4.0.0 is deprecated, use 4.0.1.
+- `init()` no longer calls `destroy()` first: preventing a second `init()` is up to the consumer. Call `destroy()` before calling `init()` again, otherwise `destroy()` can no longer remove the listeners bound by the first call.
+
 ## 4.0.0
 
 ### Major Changes
