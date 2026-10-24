@@ -3,18 +3,18 @@ import type { Detail } from './types';
 /**
  * Dispatch event
  *
- * Fires a bubbling, cancelable `disclosure-navigation:<name>` event on `target`.
+ * Fires a bubbling, cancelable `disclosure-navigation:<name>` event on `$target`.
  *
  * @returns `false` if a listener called `preventDefault()`.
  */
-export const dispatchEvent = (target: EventTarget, name: string, detail: Detail): boolean => {
+export const dispatchEvent = ($target: EventTarget, name: string, detail: Detail): boolean => {
 	const event = new CustomEvent(`disclosure-navigation:${name}`, {
 		bubbles: true,
 		cancelable: true,
 		detail,
 	});
 
-	return target.dispatchEvent(event);
+	return $target.dispatchEvent(event);
 };
 
 /**
@@ -31,7 +31,7 @@ export const focusByKey = (event: KeyboardEvent, elements: HTMLElement[], index:
 	const last = elements.length - 1;
 	const previous = index === 0 ? last : index - 1;
 	const next = index === last ? 0 : index + 1;
-	const targets: Partial<Record<string, number>> = {
+	const keys: Partial<Record<string, number>> = {
 		ArrowUp: previous,
 		ArrowLeft: previous,
 		ArrowDown: next,
@@ -39,12 +39,12 @@ export const focusByKey = (event: KeyboardEvent, elements: HTMLElement[], index:
 		Home: 0,
 		End: last,
 	};
-	const target = targets[event.key];
+	const destination = keys[event.key];
 
-	if (target === undefined) {
+	if (destination === undefined) {
 		return;
 	}
 
 	event.preventDefault();
-	elements[target].focus();
+	elements[destination].focus();
 };

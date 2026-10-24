@@ -8,7 +8,7 @@
 			name="description"
 			content="Accessible WAI-ARIA disclosure navigation that enhances the HTML you write." />
 		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;top:calc(100% + .25rem);left:0}.disclosure-nav__menu--end{left:auto;right:0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{z-index:1030;gap:.5rem;display:flex;position:absolute;top:calc(100% + .25rem);left:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding:0 0 0 .75rem;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}section[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
-		<script type="module" crossorigin src="./assets/index-VQCmf9ck.js"></script>
+		<script type="module" crossorigin src="./assets/index-BOIfId9k.js"></script>
 		<link rel="stylesheet" crossorigin href="./assets/index-B_Rliqau.css">
 	</head>
 
@@ -547,18 +547,22 @@ disclosureNavigation.init();</code></pre>
 						</thead>
 						<tbody>
 							<tr>
-								<td><code>new DisclosureNavigation(el)</code></td>
+								<td><code>new DisclosureNavigation($nav)</code></td>
 								<td>
-									<code>el</code> is the navigation. Buttons are found inside it with
+									<code>$nav</code> is the navigation. Buttons are found inside it with
 									<code>button[aria-expanded][aria-controls]</code>.
 								</td>
+							</tr>
+							<tr>
+								<td><code>$el</code></td>
+								<td>The navigation passed to the constructor.</td>
 							</tr>
 							<tr>
 								<td><code>init()</code></td>
 								<td>
 									Listens to <code>click</code>, <code>keydown</code> and
-									<code>focusout</code> on <code>el</code>. Calling it again rebinds
-									once.
+									<code>focusout</code> on <code>$nav</code>. Call
+									<code>destroy()</code> before calling it again.
 								</td>
 							</tr>
 							<tr>
@@ -589,8 +593,8 @@ disclosureNavigation.init();</code></pre>
 					needs no call. Closing the submenu once a link is followed is up to you, as in
 					the header of this page:
 				</p>
-				<pre><code class="language-javascript">disclosureNavigation.el.addEventListener('click', ({ target }) => {
-	if (target.closest('a')) {
+				<pre><code class="language-javascript">$nav.addEventListener('click', event => {
+	if (event.target.closest('a')) {
 		disclosureNavigation.close();
 	}
 });</code></pre>
