@@ -145,6 +145,11 @@ class DisclosureNavigation {
 				return;
 			}
 
+			// Hiding the focused element would send focus to the body
+			if ($element.matches(':focus-within')) {
+				$button.focus();
+			}
+
 			$element.hidden = this.#hidden.get($element) ?? true;
 		});
 
@@ -195,7 +200,13 @@ class DisclosureNavigation {
 		const index = items.indexOf($target);
 
 		if ('Escape' === event.key) {
-			$button?.focus();
+			if (!this.#expandedButtons.length) {
+				return;
+			}
+
+			// Escape is also a close request: canceling it keeps an enclosing dialog or
+			// popover open, so one press closes one layer
+			event.preventDefault();
 
 			return this.close($button);
 		}

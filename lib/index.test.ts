@@ -196,6 +196,22 @@ describe('keyboard', () => {
 		expectExpanded('about', 'about-menu', false);
 	});
 
+	it('closes the submenu, not the enclosing dialog, on Escape', async () => {
+		mount(`<dialog id="dialog">${markup}</dialog>`);
+
+		const $dialog = $<HTMLDialogElement>('dialog');
+
+		$dialog.showModal();
+		await userEvent.click($('about'));
+
+		await press($('overview'), 'Escape');
+		expectExpanded('about', 'about-menu', false);
+		expect($dialog.open).toBe(true);
+
+		await userEvent.keyboard('{Escape}');
+		expect($dialog.open).toBe(false);
+	});
+
 	it('moves focus into the submenu on ArrowDown on an expanded button', async () => {
 		mount();
 		await userEvent.click($('about'));
@@ -277,6 +293,41 @@ describe('focus', () => {
 		$('outside').focus();
 
 		expectExpanded('about', 'about-menu', false);
+		expect(document.activeElement).toBe($('outside'));
+	});
+
+	it('moves focus to the button when the submenu holding it closes', () => {
+		const instance = mount();
+
+		instance.open($('about'));
+		$('overview').focus();
+		instance.close();
+
+		expectExpanded('about', 'about-menu', false);
+		expect(document.activeElement).toBe($('about'));
+	});
+
+	it('moves focus to the outermost closing button from a nested submenu', () => {
+		const instance = mount();
+
+		instance.open($('about'));
+		instance.open($('team'));
+		$('leadership').focus();
+		instance.close($('about'));
+
+		expectExpanded('team', 'team-menu', false);
+		expect(document.activeElement).toBe($('about'));
+	});
+
+	it('leaves focus in the submenu when its close is canceled', async () => {
+		mount();
+		await userEvent.click($('about'));
+		$('nav').addEventListener('disclosure-navigation:close', event => event.preventDefault());
+
+		await press($('overview'), 'Escape');
+
+		expectExpanded('about', 'about-menu', true);
+		expect(document.activeElement).toBe($('overview'));
 	});
 
 	it('closes the submenu when its button is clicked while focus is inside it', async () => {

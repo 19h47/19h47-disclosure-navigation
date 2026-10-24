@@ -129,6 +129,14 @@ In a right-to-left context, ArrowLeft and ArrowRight swap. The library reads the
 direction from the markup with `:dir(rtl)`: a `dir` attribute on the page or the
 navigation is enough.
 
+### In a dialog or a popover
+
+Escape is also a
+[close request](https://html.spec.whatwg.org/multipage/interaction.html#close-requests):
+it closes the topmost dialog or popover. While a submenu is open, the library cancels
+the key press, so each press closes one layer: the submenu, then the dialog. With every
+submenu closed, the browser handles the key.
+
 ## API
 
 | Member                         | Description                                                                                  |
@@ -138,7 +146,7 @@ navigation is enough.
 | `init()`                       | Listens to `click`, `keydown` and `focusout` on `$nav`. Call `destroy()` before calling it again. |
 | `destroy()`                    | Removes the listeners. The markup stays in its current state.                                |
 | `open($button)`                | Closes the open submenu, then opens the one of `$button`.                                    |
-| `close($button?)`              | Closes the submenu of `$button`, or every open submenu.                                      |
+| `close($button?)`              | Closes the submenu of `$button`, or every open submenu. Focus inside a closing submenu moves to its button. |
 | `toggle($button)`              | Opens or closes the submenu of `$button`.                                                    |
 | `useArrowKeys`                 | Enables arrow, Home and End keys. Defaults to `true`.                                        |
 
