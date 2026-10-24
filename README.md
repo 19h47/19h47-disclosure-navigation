@@ -64,7 +64,7 @@ disclosureNavigation.init();
 | --------------- | ----------- | -------------------------------------------------------------------------------------- |
 | `aria-expanded` | `<button>`  | **Required.** The state. A button without it is ignored. The library updates it.       |
 | `aria-controls` | `<button>`  | **Required.** ID(s) of the submenu(s), inside the navigation. Several IDs work together. |
-| `hidden`        | Submenu     | Present while collapsed. The library updates it.                                        |
+| `hidden`        | Submenu     | Present while collapsed, or `hidden="until-found"` to keep its links searchable.        |
 | `aria-label`    | `<nav>`     | Names the landmark when the page has more than one navigation.                          |
 | `aria-current`  | `<a>`       | Optional: marks the current page.                                                       |
 
@@ -80,10 +80,34 @@ button[aria-expanded='true']::after {
 	rotate: 225deg;
 }
 
-.submenu[hidden] {
-	display: none; /* Needed only if your CSS gives .submenu a display value */
+/* Needed only if your CSS gives .submenu a display value */
+.submenu[hidden]:not([hidden='until-found']) {
+	display: none;
 }
 ```
+
+Position submenus with logical properties, such as `inset-inline-start`, so they follow
+the reading direction.
+
+### Nested submenus
+
+A submenu can hold buttons with their own submenus. Opening one keeps its parents open
+and closes the other branches. Closing a submenu closes the ones nested in it.
+
+### Find in page
+
+Write `hidden="until-found"` on collapsed submenus and their links stay searchable. When
+find in page or a link to a fragment reveals a submenu, the library opens it, nested ones
+included, and keeps `until-found` when it closes again.
+
+```html
+<ul id="about-menu" hidden="until-found">…</ul>
+```
+
+A stylesheet that sets `[hidden] { display: none }` keeps the links out of the search:
+Bootstrap's Reboot does, with `!important`. Restore `display` for `[hidden="until-found"]`.
+The browser reveals the submenu whatever a listener does: canceling the `open` event
+leaves the button collapsed next to a visible submenu.
 
 ## Keyboard
 
@@ -92,14 +116,18 @@ button[aria-expanded='true']::after {
 | Tab / Shift + Tab   | Anywhere                 | Native order. Collapsed submenus are skipped.   |
 | Enter / Space       | Button                   | Toggles its submenu (native button activation). |
 | Escape              | Button or top-level link | Closes the open submenu.                        |
-| Escape              | Submenu                  | Closes it and moves focus back to its button.   |
-| ArrowDown           | Expanded button          | Moves focus to the first item of its submenu.   |
+| Escape              | Submenu                  | Closes the innermost one and focuses its button. |
+| ArrowDown           | Expanded button, any level | Moves focus to the first item of its submenu. |
 | Arrow keys          | Top-level item           | Previous or next button or link, wrapping.      |
 | Arrow keys          | Submenu item             | Previous or next item, wrapping.                |
 | Home / End          | Top-level or submenu item | First or last item.                            |
 
 Moving focus out of the navigation closes the open submenu. Keys pressed with Alt, Ctrl
 or Meta are left to the browser, and so are arrow keys in a text field.
+
+In a right-to-left context, ArrowLeft and ArrowRight swap. The library reads the
+direction from the markup with `:dir(rtl)`: a `dir` attribute on the page or the
+navigation is enough.
 
 ## API
 
@@ -120,6 +148,20 @@ call. Closing the submenu once a link is followed is up to you:
 ```js
 $nav.addEventListener('click', event => {
 	if (event.target.closest('a')) {
+		disclosureNavigation.close();
+	}
+});
+```
+
+### Closing from outside
+
+The open submenu closes when focus leaves the navigation. Safari does not focus a button
+on click, by design: after opening a submenu with the mouse, clicking elsewhere moves no
+focus and the submenu stays open. If you need it, close it yourself:
+
+```js
+document.addEventListener('click', event => {
+	if (!$nav.contains(event.target)) {
 		disclosureNavigation.close();
 	}
 });
@@ -152,7 +194,11 @@ type is exported.
 
 Submenus are resolved with
 [`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements):
-Chrome and Edge 135, Firefox 136, Safari 16.4. The package is an ES module.
+Chrome and Edge 135, Firefox 136, Safari 16.4. For older browsers, load a polyfill of
+ARIA element reflection for `ariaControlsElements`, or use another library.
+
+Find in page relies on `hidden="until-found"`: Chrome and Edge 102, Firefox 139,
+Safari 26.2. Elsewhere it acts as `hidden`. The package is an ES module.
 
 ## Migration
 

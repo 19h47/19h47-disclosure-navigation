@@ -7,8 +7,8 @@
 		<meta
 			name="description"
 			content="Accessible WAI-ARIA disclosure navigation that enhances the HTML you write." />
-		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;top:calc(100% + .25rem);left:0}.disclosure-nav__menu--end{left:auto;right:0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{z-index:1030;gap:.5rem;display:flex;position:absolute;top:calc(100% + .25rem);left:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding:0 0 0 .75rem;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}section[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
-		<script type="module" crossorigin src="./assets/index-BOIfId9k.js"></script>
+		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{top:calc(100% + .25rem);z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;inset-inline-start:0}.disclosure-nav__menu--end{inset-inline:auto 0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}.disclosure-nav__menu[hidden=until-found]{display:block!important}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{top:calc(100% + .25rem);z-index:1030;gap:.5rem;display:flex;position:absolute;inset-inline-start:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding-block:0;padding-inline:.75rem 0;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
+		<script type="module" crossorigin src="./assets/index-DmeVD6bB.js"></script>
 		<link rel="stylesheet" crossorigin href="./assets/index-B_Rliqau.css">
 	</head>
 
@@ -36,6 +36,7 @@
 								<li><a href="#markup">Markup</a></li>
 								<li><a href="#styling">Styling</a></li>
 								<li><a href="#keyboard">Keyboard</a></li>
+								<li><a href="#find">Find in page</a></li>
 							</ul>
 						</li>
 						<li>
@@ -235,6 +236,16 @@ disclosureNavigation.init();</code></pre>
 							</div>
 							<div class="form-check form-switch">
 								<input
+									id="playground-rtl"
+									class="form-check-input"
+									type="checkbox"
+									role="switch" />
+								<label class="form-check-label" for="playground-rtl"
+									>Right to left (<code>dir="rtl"</code>)</label
+								>
+							</div>
+							<div class="form-check form-switch">
+								<input
 									id="playground-bound"
 									class="form-check-input"
 									type="checkbox"
@@ -353,7 +364,7 @@ disclosureNavigation.init();</code></pre>
 				<p>
 					Render the current section open: write <code>aria-expanded="true"</code> and leave
 					out <code>hidden</code>. The library starts from there. This sidebar is the same
-					library with a vertical layout.
+					library with a vertical layout and a nested submenu.
 				</p>
 				<div class="col-md-6 col-lg-4 p-3 border rounded-3">
 					<nav id="sidebar-nav" class="disclosure-nav disclosure-nav--vertical" aria-label="Sidebar">
@@ -382,12 +393,34 @@ disclosureNavigation.init();</code></pre>
 								<ul id="sidebar-nav-reference" class="disclosure-nav__menu" hidden>
 									<li><a href="#events">Events</a></li>
 									<li><a href="#api">API</a></li>
+									<li>
+										<button
+											class="disclosure-nav__item"
+											type="button"
+											aria-expanded="false"
+											aria-controls="sidebar-nav-more">
+											More
+										</button>
+										<ul id="sidebar-nav-more" class="disclosure-nav__menu" hidden>
+											<li><a href="#styling">Styling</a></li>
+											<li><a href="#keyboard">Keyboard</a></li>
+										</ul>
+									</li>
 								</ul>
 							</li>
 							<li><a class="disclosure-nav__item" href="#support">Browser support</a></li>
 						</ul>
 					</nav>
 				</div>
+
+				<h3 class="h5 mt-4">Nested submenus</h3>
+				<p>
+					A submenu can hold buttons with their own submenus, like <em>More</em> in the sidebar.
+					Opening one keeps its parents open and closes the other branches. Closing a
+					submenu closes the ones nested in it. Arrow keys move within one level,
+					<kbd>↓</kbd> on an expanded button enters its submenu, and <kbd>Escape</kbd> closes
+					the innermost one.
+				</p>
 			</section>
 
 			<section id="styling" class="mb-5">
@@ -426,8 +459,9 @@ disclosureNavigation.init();</code></pre>
 }</code></pre>
 				<p>
 					If your CSS gives the submenu a <code>display</code> value, restore
-					<code>[hidden] { display: none; }</code> for it (Bootstrap's Reboot already
-					does).
+					<code>[hidden]:not([hidden="until-found"]) { display: none; }</code> for it. Use
+					logical properties such as <code>inset-inline-start</code> to position submenus: they
+					then follow the reading direction.
 				</p>
 			</section>
 
@@ -461,11 +495,11 @@ disclosureNavigation.init();</code></pre>
 							<tr>
 								<td><kbd>Escape</kbd></td>
 								<td>Submenu</td>
-								<td>Closes it and moves focus back to its button.</td>
+								<td>Closes the innermost one and moves focus back to its button.</td>
 							</tr>
 							<tr>
 								<td><kbd>↓</kbd></td>
-								<td>Expanded button</td>
+								<td>Expanded button, at any level</td>
 								<td>Moves focus to the first item of its submenu.</td>
 							</tr>
 							<tr>
@@ -492,6 +526,97 @@ disclosureNavigation.init();</code></pre>
 					<kbd>Alt</kbd>, <kbd>Ctrl</kbd> or <kbd>⌘</kbd> are left to the browser, and so
 					are arrow keys in a text field. Moving focus out of the navigation closes the
 					open submenu.
+				</p>
+				<p>
+					In a right-to-left context, <kbd>←</kbd> and <kbd>→</kbd> swap. The library reads the
+					direction from the markup with <code>:dir(rtl)</code>, so a <code>dir</code> attribute on
+					the page or the navigation is enough: try it in the playground.
+				</p>
+			</section>
+
+			<section id="find" class="mb-5">
+				<h2>Find in page</h2>
+				<p>
+					Write <code>hidden="until-found"</code> on collapsed submenus and their links stay
+					searchable. When find in page (<kbd>Ctrl</kbd> + <kbd>F</kbd> or <kbd>⌘</kbd> +
+					<kbd>F</kbd>) or a link to a fragment reveals a submenu, the library opens it, nested
+					ones included, and keeps <code>until-found</code> when it closes again.
+				</p>
+				<p>
+					Search this page for “Kerning”: the first match is this sentence, press
+					<kbd>Enter</kbd> to jump to the next one, two submenus deep below. Or follow a
+					<a href="#find-kerning">link to the fragment</a>.
+				</p>
+
+				<div class="row g-4">
+					<div class="col-md-6 col-lg-4">
+						<div class="p-3 border rounded-3">
+							<nav id="find-nav" class="disclosure-nav disclosure-nav--vertical" aria-label="Typography">
+								<ul>
+									<li>
+										<button
+											class="disclosure-nav__item"
+											type="button"
+											aria-expanded="false"
+											aria-controls="find-nav-type">
+											Typography
+										</button>
+										<ul id="find-nav-type" class="disclosure-nav__menu" hidden="until-found">
+											<li><a href="#find">Typefaces</a></li>
+											<li>
+												<button
+													class="disclosure-nav__item"
+													type="button"
+													aria-expanded="false"
+													aria-controls="find-nav-spacing">
+													Spacing
+												</button>
+												<ul id="find-nav-spacing" class="disclosure-nav__menu" hidden="until-found">
+													<li><a id="find-kerning" href="#find">Kerning</a></li>
+													<li><a href="#find">Leading</a></li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+									<li>
+										<button
+											class="disclosure-nav__item"
+											type="button"
+											aria-expanded="false"
+											aria-controls="find-nav-color">
+											Color
+										</button>
+										<ul id="find-nav-color" class="disclosure-nav__menu" hidden="until-found">
+											<li><a href="#find">Contrast</a></li>
+											<li><a href="#find">Palettes</a></li>
+										</ul>
+									</li>
+								</ul>
+							</nav>
+						</div>
+
+						<h3 id="find-log-label" class="h6 mt-3">Event log</h3>
+						<div class="playground-log p-2 border rounded-3" role="log" aria-labelledby="find-log-label">
+							<ol id="find-log" class="list-unstyled small font-monospace mb-0"></ol>
+						</div>
+					</div>
+
+					<div class="col-md-6 col-lg-8">
+						<pre class="mt-0"><code class="language-html">&lt;button type="button" aria-expanded="false" aria-controls="typography"&gt;
+	Typography
+&lt;/button&gt;
+&lt;ul id="typography" hidden="until-found"&gt;…&lt;/ul&gt;</code></pre>
+						<pre><code class="language-css">/* Bootstrap's Reboot sets [hidden] to display: none !important,
+   which keeps the links out of the search */
+.disclosure-nav__menu[hidden="until-found"] {
+	display: block !important;
+}</code></pre>
+					</div>
+				</div>
+
+				<p class="mt-3">
+					The browser reveals the submenu whatever a listener does: canceling the
+					<code>open</code> event leaves the button collapsed next to a visible submenu.
 				</p>
 			</section>
 
@@ -598,6 +723,19 @@ disclosureNavigation.init();</code></pre>
 		disclosureNavigation.close();
 	}
 });</code></pre>
+
+				<h3 class="h5 mt-4">Closing from outside</h3>
+				<p>
+					The open submenu closes when focus leaves the navigation. Safari does not focus a
+					button on click, by design: after opening a submenu with the mouse, clicking
+					elsewhere moves no focus and the submenu stays open. If you need it, close it
+					yourself:
+				</p>
+				<pre><code class="language-javascript">document.addEventListener('click', event => {
+	if (!$nav.contains(event.target)) {
+		disclosureNavigation.close();
+	}
+});</code></pre>
 			</section>
 
 			<section id="support" class="mb-5">
@@ -606,8 +744,14 @@ disclosureNavigation.init();</code></pre>
 					Submenus are resolved with
 					<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements"
 						><code>ariaControlsElements</code></a
-					>: Chrome and Edge 135, Firefox 136, Safari 16.4. The library ships as an ES
-					module.
+					>: Chrome and Edge 135, Firefox 136, Safari 16.4. For older browsers, load a
+					polyfill of ARIA element reflection for <code>ariaControlsElements</code>, or use
+					another library.
+				</p>
+				<p>
+					Find in page relies on <code>hidden="until-found"</code>: Chrome and Edge 102,
+					Firefox 139, Safari 26.2. Elsewhere it acts as <code>hidden</code>. The library ships
+					as an ES module.
 				</p>
 			</section>
 		</main>

@@ -10,7 +10,13 @@ const markup = `
 				<button id="about" type="button" aria-expanded="false" aria-controls="about-menu">About</button>
 				<ul id="about-menu" hidden>
 					<li><a id="overview" href="#overview">Overview</a></li>
-					<li><a id="team" href="#team">Team</a></li>
+					<li>
+						<button id="team" type="button" aria-expanded="false" aria-controls="team-menu">Team</button>
+						<ul id="team-menu" hidden>
+							<li><a id="leadership" href="#leadership">Leadership</a></li>
+							<li><a id="designers" href="#designers">Designers</a></li>
+						</ul>
+					</li>
 					<li><a id="history" href="#history">History</a></li>
 				</ul>
 			</li>
@@ -56,10 +62,19 @@ const expectExpanded = (button: string, menu: string, expanded: boolean): void =
 	expect($(menu).hidden).toBe(!expanded);
 };
 
+const supportsUntilFound = (() => {
+	const $element = document.createElement('div');
+
+	$element.hidden = 'until-found';
+
+	return $element.hidden === 'until-found';
+})();
+
 afterEach(() => {
 	disclosureNavigation?.destroy();
 	disclosureNavigation = null;
 	document.body.innerHTML = '';
+	history.replaceState(null, '', location.pathname + location.search);
 });
 
 describe('markup', () => {
@@ -264,6 +279,16 @@ describe('focus', () => {
 		expectExpanded('about', 'about-menu', false);
 	});
 
+	it('closes the submenu when its button is clicked while focus is inside it', async () => {
+		mount();
+		await userEvent.click($('about'));
+
+		$('overview').focus();
+		await userEvent.click($('about'));
+
+		expectExpanded('about', 'about-menu', false);
+	});
+
 	it('keeps the submenu open while focus stays inside the navigation', async () => {
 		mount();
 		await userEvent.click($('about'));
@@ -272,6 +297,114 @@ describe('focus', () => {
 		$('home').focus();
 
 		expectExpanded('about', 'about-menu', true);
+	});
+});
+
+describe('nested submenus', () => {
+	it('keeps the parent open when a nested submenu opens', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+
+		expectExpanded('about', 'about-menu', true);
+		expectExpanded('team', 'team-menu', true);
+	});
+
+	it('closes the nested submenus with their parent', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+		await userEvent.click($('about'));
+
+		expectExpanded('about', 'about-menu', false);
+		expectExpanded('team', 'team-menu', false);
+	});
+
+	it('closes the nested submenus when another branch opens', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+		await userEvent.click($('services'));
+
+		expectExpanded('about', 'about-menu', false);
+		expectExpanded('team', 'team-menu', false);
+		expectExpanded('services', '1-services', true);
+	});
+
+	it('closes only the innermost submenu on Escape inside it', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+
+		await press($('leadership'), 'Escape');
+
+		expectExpanded('team', 'team-menu', false);
+		expectExpanded('about', 'about-menu', true);
+		expect(document.activeElement).toBe($('team'));
+	});
+
+	it('moves into a nested submenu on ArrowDown on its expanded button', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+
+		await press($('team'), 'ArrowDown');
+
+		expect(document.activeElement).toBe($('leadership'));
+	});
+
+	it('skips the items of nested submenus when moving within a submenu', async () => {
+		mount();
+		await userEvent.click($('about'));
+		await userEvent.click($('team'));
+
+		await press($('history'), 'ArrowUp');
+
+		expect(document.activeElement).toBe($('team'));
+	});
+});
+
+describe('reading direction', () => {
+	it('swaps left and right in a right-to-left navigation', async () => {
+		mount(markup.replace('<nav id="nav"', '<nav id="nav" dir="rtl"'));
+
+		await press($('home'), 'ArrowLeft');
+		expect(document.activeElement).toBe($('about'));
+
+		await userEvent.keyboard('{ArrowRight}');
+		expect(document.activeElement).toBe($('home'));
+	});
+});
+
+describe.runIf(supportsUntilFound)('hidden="until-found"', () => {
+	const untilFound = markup
+		.replace('<ul id="about-menu" hidden>', '<ul id="about-menu" hidden="until-found">')
+		.replace('<ul id="team-menu" hidden>', '<ul id="team-menu" hidden="until-found">');
+
+	it('restores until-found when a submenu closes', async () => {
+		mount(untilFound);
+
+		await userEvent.click($('about'));
+		expect($('about-menu').hidden).toBe(false);
+
+		await userEvent.click($('about'));
+		expect($('about-menu').hidden).toBe('until-found');
+	});
+
+	it('opens the submenus revealed by fragment navigation, nested ones included', async () => {
+		const { $el } = mount(untilFound);
+		const events: string[] = [];
+
+		$el.addEventListener('disclosure-navigation:open', event => {
+			events.push(event.detail.$button.id);
+		});
+
+		location.hash = 'designers';
+
+		await expect.poll(() => $('about').getAttribute('aria-expanded')).toBe('true');
+		expectExpanded('team', 'team-menu', true);
+		expectExpanded('about', 'about-menu', true);
+		expect(events).toEqual(['team', 'about']);
 	});
 });
 

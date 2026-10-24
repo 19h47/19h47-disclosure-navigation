@@ -10,10 +10,9 @@ const isExpanded = ($button: HTMLButtonElement): boolean => $button.ariaExpanded
 const controlledElements = ($button: HTMLButtonElement): HTMLElement[] =>
 	($button.ariaControlsElements ?? []) as HTMLElement[];
 
-const menuItems = ($button: HTMLButtonElement): HTMLElement[] =>
-	controlledElements($button).flatMap($element => [
-		...$element.querySelectorAll<HTMLElement>(MENU_ITEMS),
-	]);
+/** Whether `$node` is inside one of the submenus of `$button`. */
+const controls = ($button: HTMLButtonElement, $node: Node): boolean =>
+	controlledElements($button).some($element => $element.contains($node));
 
 /**
  * Disclosure Navigation
@@ -37,6 +36,8 @@ class DisclosureNavigation {
 	$el: HTMLElement;
 	useArrowKeys = true;
 	#controller: AbortController | null = null;
+	/** The `hidden` value of each submenu before it opened, so `until-found` survives a close. */
+	#hidden = new WeakMap<HTMLElement, true | 'until-found'>();
 
 	constructor($el: HTMLElement) {
 		this.$el = $el;
@@ -51,6 +52,7 @@ class DisclosureNavigation {
 		this.$el.addEventListener('click', this.#handleClick, { signal });
 		this.$el.addEventListener('keydown', this.#handleKeydown, { signal });
 		this.$el.addEventListener('focusout', this.#handleFocusout, { signal });
+		this.$el.addEventListener('beforematch', this.#handleBeforematch, { signal });
 	}
 
 	/** Removes the listeners. The markup stays in its current state. */
@@ -58,10 +60,15 @@ class DisclosureNavigation {
 		this.#controller?.abort();
 	}
 
-	/** Opens the submenu of `$button`, after closing the one already open. */
+	/** Opens the submenu of `$button`, after closing the open ones outside its branch. */
 	open($button: HTMLButtonElement): void {
 		const closed = this.#expandedButtons
-			.filter($expanded => $expanded !== $button)
+			.filter(
+				$expanded =>
+					$expanded !== $button &&
+					!controls($expanded, $button) &&
+					!controls($button, $expanded),
+			)
 			.every($expanded => this.#expand($expanded, false));
 
 		if (closed) {
@@ -69,9 +76,13 @@ class DisclosureNavigation {
 		}
 	}
 
-	/** Closes the submenu of `$button`, or every open submenu. */
+	/** Closes the submenu of `$button` and the ones nested in it, or every open submenu. */
 	close($button?: HTMLButtonElement): void {
-		const buttons = $button ? [$button] : this.#expandedButtons;
+		const buttons = $button
+			? this.#expandedButtons.filter(
+					$expanded => $expanded === $button || controls($button, $expanded),
+				)
+			: this.#expandedButtons;
 
 		buttons.forEach($expanded => this.#expand($expanded, false));
 	}
@@ -92,13 +103,17 @@ class DisclosureNavigation {
 		return this.#buttons.filter(isExpanded);
 	}
 
-	/** Buttons and links of the navigation itself, outside every submenu. */
-	get #topLevelItems(): HTMLElement[] {
-		const elements = this.#buttons.flatMap(controlledElements);
+	/** Items inside `containers`, outside the submenus nested in them. */
+	#items(containers: HTMLElement[], selector: string): HTMLElement[] {
+		const submenus = this.#buttons
+			.flatMap(controlledElements)
+			.filter($submenu =>
+				containers.some($container => $container !== $submenu && $container.contains($submenu)),
+			);
 
-		return [...this.$el.querySelectorAll<HTMLElement>(TOP_LEVEL_ITEMS)].filter(
-			$item => !elements.some($element => $element.contains($item)),
-		);
+		return containers
+			.flatMap($container => [...$container.querySelectorAll<HTMLElement>(selector)])
+			.filter($item => !submenus.some($submenu => $submenu.contains($item)));
 	}
 
 	/**
@@ -123,7 +138,14 @@ class DisclosureNavigation {
 
 		$button.ariaExpanded = expanded.toString();
 		elements.forEach($element => {
-			$element.hidden = !expanded;
+			if (expanded) {
+				this.#hidden.set($element, $element.hidden || true);
+				$element.hidden = false;
+
+				return;
+			}
+
+			$element.hidden = this.#hidden.get($element) ?? true;
 		});
 
 		return true;
@@ -138,38 +160,47 @@ class DisclosureNavigation {
 	};
 
 	#handleFocusout = (event: FocusEvent): void => {
-		if (!this.$el.contains(event.relatedTarget as Node | null)) {
-			this.close();
+		// Safari does not focus a clicked button: focus leaves for nowhere while the
+		// navigation is being clicked, and the click toggles the submenu itself
+		if (this.$el.contains(event.relatedTarget as Node | null) || this.$el.matches(':active')) {
+			return;
 		}
+
+		this.close();
+	};
+
+	/** Find in page or fragment navigation reveals a submenu in `hidden="until-found"`. */
+	#handleBeforematch = (event: Event): void => {
+		const $target = event.target as HTMLElement;
+		const $button = this.#buttons.find($button => controlledElements($button).includes($target));
+
+		if (!$button) {
+			return;
+		}
+
+		this.open($button);
+
+		// The browser removes `hidden` after this event, and stops revealing the
+		// ancestors when it is already gone
+		$target.hidden = 'until-found';
 	};
 
 	#handleKeydown = (event: KeyboardEvent): void => {
 		const $target = event.target as HTMLElement;
-		const $button = this.#expandedButtons.find($expanded =>
-			controlledElements($expanded).some($element => $element.contains($target)),
-		);
-
-		if ($button) {
-			return this.#handleMenuKeydown(event, $button);
-		}
-
-		return this.#handleTopLevelKeydown(event);
-	};
-
-	#handleTopLevelKeydown(event: KeyboardEvent): void {
-		const items = this.#topLevelItems;
-		const $target = event.target as HTMLElement;
+		// The innermost open submenu holding the focus, none at the top level
+		const $button = this.#expandedButtons.findLast($expanded => controls($expanded, $target));
+		const items = $button
+			? this.#items(controlledElements($button), MENU_ITEMS)
+			: this.#items([this.$el], TOP_LEVEL_ITEMS);
 		const index = items.indexOf($target);
 
-		if (index === -1) {
-			return;
-		}
-
 		if ('Escape' === event.key) {
-			return this.close();
+			$button?.focus();
+
+			return this.close($button);
 		}
 
-		if (!this.useArrowKeys) {
+		if (!this.useArrowKeys || index === -1) {
 			return;
 		}
 
@@ -177,30 +208,11 @@ class DisclosureNavigation {
 		if ('ArrowDown' === event.key && $target instanceof HTMLButtonElement && isExpanded($target)) {
 			event.preventDefault();
 
-			return menuItems($target)[0]?.focus();
+			return this.#items(controlledElements($target), MENU_ITEMS)[0]?.focus();
 		}
 
 		return focusByKey(event, items, index);
-	}
-
-	#handleMenuKeydown(event: KeyboardEvent, $button: HTMLButtonElement): void {
-		if ('Escape' === event.key) {
-			$button.focus();
-
-			return this.close($button);
-		}
-
-		if (!this.useArrowKeys) {
-			return;
-		}
-
-		const items = menuItems($button);
-		const index = items.indexOf(event.target as HTMLElement);
-
-		if (index !== -1) {
-			focusByKey(event, items, index);
-		}
-	}
+	};
 }
 
 export default DisclosureNavigation;

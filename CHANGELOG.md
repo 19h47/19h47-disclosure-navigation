@@ -1,5 +1,17 @@
 # @19h47/disclosure-navigation
 
+## 4.1.0
+
+### Minor Changes
+
+- Nested submenus: opening one keeps its parents open and closes the other branches, closing one closes the submenus nested in it. Arrow keys move within one level, ArrowDown on an expanded button enters its submenu at any level, and Escape closes the innermost submenu.
+- Find in page: submenus can use `hidden="until-found"`. When find in page or fragment navigation reveals one, the library opens it, nested ones included, and restores `until-found` when it closes.
+- Right-to-left: ArrowLeft and ArrowRight swap when the navigation reads right to left, read from the markup with `:dir(rtl)`.
+
+### Patch Changes
+
+- Safari: clicking the button of an open submenu while the focus is inside the navigation now closes it. Safari does not focus clicked buttons, so the submenu closed on `focusout` and the click reopened it.
+
 ## 4.0.1
 
 ### Patch Changes
