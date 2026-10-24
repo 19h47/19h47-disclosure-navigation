@@ -16,8 +16,10 @@ hide submenus. Implementation follows the
   `aria-controls`, and never adds a missing attribute.
 - **Built on the platform.** Native `<button>`, the `hidden` attribute,
   [`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements),
-  `AbortController`.
-- **Small and typed.** About 1 kB gzipped, no dependency, TypeScript declarations included.
+  [`ToggleEvent`](https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent) as popovers
+  fire it, `AbortController`.
+- **Small and typed.** About 1.5 kB gzipped, no dependency, TypeScript declarations
+  included. The DOM library already types the events.
 
 See the [documentation](https://19h47.github.io/19h47-disclosure-navigation/) for live
 examples.
@@ -106,7 +108,7 @@ included, and keeps `until-found` when it closes again.
 
 A stylesheet that sets `[hidden] { display: none }` keeps the links out of the search:
 Bootstrap's Reboot does, with `!important`. Restore `display` for `[hidden="until-found"]`.
-The browser reveals the submenu whatever a listener does: canceling the `open` event
+The browser reveals the submenu whatever a listener does: canceling `beforetoggle`
 leaves the button collapsed next to a visible submenu.
 
 ## Keyboard
@@ -137,15 +139,19 @@ it closes the topmost dialog or popover. While a submenu is open, the library ca
 the key press, so each press closes one layer: the submenu, then the dialog. With every
 submenu closed, the browser handles the key.
 
+The library sees Escape while focus is in the navigation. Safari does not focus a
+clicked button: after opening a submenu with the mouse, focus stays on the dialog and
+Escape closes it.
+
 ## API
 
 | Member                         | Description                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------------------- |
 | `new DisclosureNavigation($nav)` | `$nav` is the navigation. Buttons are found inside it with `button[aria-expanded][aria-controls]`. |
 | `$el`                          | The navigation passed to the constructor.                                                    |
-| `init()`                       | Listens to `click`, `keydown` and `focusout` on `$nav`. Call `destroy()` before calling it again. |
+| `init()`                       | Listens to `click`, `keydown`, `focusout` and `beforematch` on `$nav`. Call `destroy()` before calling it again. |
 | `destroy()`                    | Removes the listeners. The markup stays in its current state.                                |
-| `open($button)`                | Closes the open submenu, then opens the one of `$button`.                                    |
+| `open($button)`                | Opens the submenu of `$button` and closes the other branches. Canceling its `beforetoggle` leaves every submenu as it is. |
 | `close($button?)`              | Closes the submenu of `$button`, or every open submenu. Focus inside a closing submenu moves to its button. |
 | `toggle($button)`              | Opens or closes the submenu of `$button`.                                                    |
 | `useArrowKeys`                 | Enables arrow, Home and End keys. Defaults to `true`.                                        |
@@ -177,38 +183,96 @@ document.addEventListener('click', event => {
 
 ## Events
 
-| Event                         | Cancelable | Detail                  |
-| ----------------------------- | ---------- | ----------------------- |
-| `disclosure-navigation:open`  | Yes        | `{ $button, elements }` |
-| `disclosure-navigation:close` | Yes        | `{ $button, elements }` |
+The library fires the platform's events, the way a popover does: a
+[`ToggleEvent`](https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent) named
+`beforetoggle`, then `toggle`, at each submenu. The same listener works for `<details>`,
+popovers and `<dialog>`.
 
-Events fire on the button **before** the DOM changes and bubble, so one listener on the
-navigation is enough. Call `preventDefault()` to cancel the change.
+| Event          | Fires                                                                                     | Cancelable             |
+| -------------- | ----------------------------------------------------------------------------------------- | ---------------------- |
+| `beforetoggle` | **Before** the DOM changes.                                                               | When the submenu opens. |
+| `toggle`       | **After**, in a later task. Changes made before it fires coalesce into one event, from the first old state to the last new state. | No. |
+
+`event.target` is the submenu, `event.source` its button, and `oldState` and `newState`
+are `'open'` or `'closed'`. As on the platform, the events do not bubble: otherwise a
+submenu's `toggle` would reach the `ontoggle` of a `<details>` or a `<dialog>` holding the
+navigation. Listen on the submenu, or on the navigation in the capture phase.
 
 ```js
-$nav.addEventListener('disclosure-navigation:open', event => {
-	const { $button, elements } = event.detail;
+$nav.addEventListener(
+	'beforetoggle',
+	event => {
+		if ('open' === event.newState && 'services' === event.source.id) {
+			event.preventDefault(); // Services stays closed
+		}
+	},
+	{ capture: true },
+);
 
-	if ('services' === $button.id) {
-		event.preventDefault();
-	}
-});
+$nav.addEventListener(
+	'toggle',
+	event => console.log(event.target.id, event.newState),
+	{ capture: true },
+);
 ```
 
-In TypeScript, both events are declared on `HTMLElementEventMap`, and the `Detail`
-type is exported.
+Canceling an opening leaves every submenu as it is, the open one included: the other
+branches close after `beforetoggle`. Closing cannot be canceled. A button that controls
+several elements fires at each one, and opens none of them when one opening is canceled.
+In TypeScript, the DOM library already types both events as `ToggleEvent`.
 
 ## Browser support
 
-Submenus are resolved with
-[`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements):
-Chrome and Edge 135, Firefox 136, Safari 16.4. For older browsers, load a polyfill of
+Version 5 runs in Chrome and Edge 135, Firefox 136 and Safari 17: submenus are resolved
+with
+[`ariaControlsElements`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements)
+and events are [`ToggleEvent`](https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent)s.
+`event.source` needs Chrome and Edge 140, Firefox 145 and Safari 26.5: older browsers
+fire the events without it.
+
+For older browsers, stay on version 4.1, which runs from Safari 16.4, load a polyfill of
 ARIA element reflection for `ariaControlsElements`, or use another library.
 
 Find in page relies on `hidden="until-found"`: Chrome and Edge 102, Firefox 139,
 Safari 26.2. Elsewhere it acts as `hidden`. The package is an ES module.
 
 ## Migration
+
+### From 4.x to 5.0
+
+The custom events are replaced by the platform's `beforetoggle` and `toggle`, fired the
+way a popover fires them. Markup, styles and methods do not change.
+
+1. **Listen to `beforetoggle`.** It replaces `disclosure-navigation:open` and
+   `disclosure-navigation:close`, and `event.newState` tells which one happens. It fires
+   at each submenu instead of the button, and does not bubble: listen on the submenu, or
+   on the navigation in the capture phase. The button is `event.source`, the submenu
+   `event.target`.
+
+   ```diff
+   - $nav.addEventListener('disclosure-navigation:open', event => {
+   -   const { $button, elements } = event.detail;
+   - });
+   + $nav.addEventListener('beforetoggle', event => {
+   +   if ('open' === event.newState) {
+   +     const $button = event.source;
+   +     const $submenu = event.target;
+   +   }
+   + }, { capture: true });
+   ```
+
+2. **Stop canceling closings.** As on a popover, `preventDefault()` only cancels an
+   opening. The other branches now close after `beforetoggle`, so canceling an opening
+   leaves the open submenu open.
+3. **React after the change with `toggle`.** It is new: it fires in a later task, once for
+   changes made in a row.
+4. **Expect one event per element.** A button with several IDs in `aria-controls` fires
+   at each element, and canceling one opening cancels them all.
+5. **Expect nested submenus to close innermost first**, as nested popovers do.
+6. **Drop the `Detail` type.** The `HTMLElementEventMap` declarations are removed too: the
+   DOM library types `beforetoggle` and `toggle` as `ToggleEvent`.
+7. **Check browser support.** Version 5 needs Safari 17, and `event.source` needs
+   Chrome 140, Firefox 145 and Safari 26.5. Stay on 4.1 for older browsers.
 
 ### From 3.x to 4.0
 

@@ -246,7 +246,7 @@
 								<li>
 									<a
 										href="https://github.com/19h47/19h47-disclosure-navigation#migration"
-										>Migrating from v3</a
+										>Migration guide</a
 									>
 								</li>
 							</ul>
@@ -303,7 +303,8 @@
 							<p class="small mb-0">
 								Native <code>&lt;button&gt;</code> for Enter and Space, the
 								<code>hidden</code> attribute, <code>ariaControlsElements</code> to
-								find submenus, <code>AbortController</code> to clean up.
+								find submenus, <code>ToggleEvent</code> as popovers fire it,
+								<code>AbortController</code> to clean up.
 							</p>
 						</div>
 					</div>
@@ -311,8 +312,8 @@
 						<div class="h-100 p-3 border rounded-3">
 							<h2 class="h6">Small and typed</h2>
 							<p class="small mb-0">
-								About 1&nbsp;kB gzipped, no dependency, TypeScript declarations and
-								typed events included.
+								About 1.5&nbsp;kB gzipped, no dependency, TypeScript declarations
+								included. The DOM library already types the events.
 							</p>
 						</div>
 					</div>
@@ -731,6 +732,11 @@ disclosureNavigation.init();</code></pre>
 					cancels the key press, so each press closes one layer: the submenu, then the
 					dialog. With every submenu closed, the browser handles the key.
 				</p>
+				<p>
+					The library sees <kbd>Escape</kbd> while focus is in the navigation. Safari does
+					not focus a clicked button: after opening a submenu with the mouse, focus stays
+					on the dialog and <kbd>Escape</kbd> closes it.
+				</p>
 				<button class="btn btn-outline-secondary" type="button" commandfor="dialog-demo" command="show-modal">
 					Open the mobile menu
 				</button>
@@ -863,48 +869,75 @@ disclosureNavigation.init();</code></pre>
 				</div>
 
 				<p class="mt-3">
-					The browser reveals the submenu whatever a listener does: canceling the
-					<code>open</code> event leaves the button collapsed next to a visible submenu.
+					The browser reveals the submenu whatever a listener does: canceling
+					<code>beforetoggle</code> leaves the button collapsed next to a visible submenu.
 				</p>
 			</section>
 
 			<section id="events" class="mb-5">
 				<h2>Events</h2>
 				<p>
-					Events fire on the button <strong>before</strong> the DOM changes and bubble, so
-					one listener on the navigation is enough. Call <code>preventDefault()</code> to
-					cancel the change.
+					The library fires the platform's events, the way a popover does: a
+					<code>ToggleEvent</code> named <code>beforetoggle</code>, then <code>toggle</code>,
+					at each submenu. The same listener works for <code>&lt;details&gt;</code>, popovers
+					and <code>&lt;dialog&gt;</code>.
 				</p>
 				<div class="table-responsive">
 					<table class="table table-sm align-middle">
 						<thead>
 							<tr>
 								<th scope="col">Event</th>
-								<th scope="col">Detail</th>
+								<th scope="col">Fires</th>
+								<th scope="col">Cancelable</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td><code>disclosure-navigation:open</code></td>
-								<td><code>{ $button, elements }</code></td>
+								<td><code>beforetoggle</code></td>
+								<td><strong>Before</strong> the DOM changes.</td>
+								<td>When the submenu opens.</td>
 							</tr>
 							<tr>
-								<td><code>disclosure-navigation:close</code></td>
-								<td><code>{ $button, elements }</code></td>
+								<td><code>toggle</code></td>
+								<td>
+									<strong>After</strong>, in a later task. Changes made before it fires
+									coalesce into one event, from the first old state to the last new
+									state.
+								</td>
+								<td>No.</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<pre><code class="language-javascript">$nav.addEventListener('disclosure-navigation:open', event => {
-	const { $button, elements } = event.detail;
-
-	if ('services' === $button.id) {
-		event.preventDefault(); // Services stays closed
-	}
-});</code></pre>
 				<p>
-					In TypeScript, both events are declared on <code>HTMLElementEventMap</code>:
-					<code>event.detail</code> is typed.
+					<code>event.target</code> is the submenu, <code>event.source</code> its button, and
+					<code>oldState</code> and <code>newState</code> are <code>'open'</code> or
+					<code>'closed'</code>. As on the platform, the events do not bubble: otherwise a
+					submenu's <code>toggle</code> would reach the <code>ontoggle</code> of a
+					<code>&lt;details&gt;</code> or a <code>&lt;dialog&gt;</code> holding the
+					navigation. Listen on the submenu, or on the navigation in the capture phase.
+				</p>
+				<pre><code class="language-javascript">$nav.addEventListener(
+	'beforetoggle',
+	event => {
+		if ('open' === event.newState && 'services' === event.source.id) {
+			event.preventDefault(); // Services stays closed
+		}
+	},
+	{ capture: true },
+);
+
+$nav.addEventListener(
+	'toggle',
+	event => console.log(event.target.id, event.newState),
+	{ capture: true },
+);</code></pre>
+				<p>
+					Canceling an opening leaves every submenu as it is, the open one included: the
+					other branches close after <code>beforetoggle</code>. Closing cannot be canceled.
+					A button that controls several elements fires at each one, and opens none of them
+					when one opening is canceled. In TypeScript, the DOM library already types both
+					events as <code>ToggleEvent</code>.
 				</p>
 			</section>
 
@@ -933,8 +966,9 @@ disclosureNavigation.init();</code></pre>
 							<tr>
 								<td><code>init()</code></td>
 								<td>
-									Listens to <code>click</code>, <code>keydown</code> and
-									<code>focusout</code> on <code>$nav</code>. Call
+									Listens to <code>click</code>, <code>keydown</code>,
+									<code>focusout</code> and <code>beforematch</code> on
+									<code>$nav</code>. Call
 									<code>destroy()</code> before calling it again.
 								</td>
 							</tr>
@@ -944,7 +978,11 @@ disclosureNavigation.init();</code></pre>
 							</tr>
 							<tr>
 								<td><code>open($button)</code></td>
-								<td>Closes the open submenu, then opens the one of <code>$button</code>.</td>
+								<td>
+									Opens the submenu of <code>$button</code> and closes the other
+									branches. Canceling its <code>beforetoggle</code> leaves every
+									submenu as it is.
+								</td>
 							</tr>
 							<tr>
 								<td><code>close($button?)</code></td>
@@ -992,10 +1030,19 @@ disclosureNavigation.init();</code></pre>
 			<section id="support" class="mb-5">
 				<h2>Browser support</h2>
 				<p>
-					Submenus are resolved with
+					Version 5 runs in Chrome and Edge 135, Firefox 136 and Safari 17: submenus are
+					resolved with
 					<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements"
 						><code>ariaControlsElements</code></a
-					>: Chrome and Edge 135, Firefox 136, Safari 16.4. For older browsers, load a
+					>
+					and events are
+					<a href="https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent"
+						><code>ToggleEvent</code></a
+					>s. <code>event.source</code> needs Chrome and Edge 140, Firefox 145 and Safari
+					26.5: older browsers fire the events without it.
+				</p>
+				<p>
+					For older browsers, stay on version 4.1, which runs from Safari 16.4, load a
 					polyfill of ARIA element reflection for <code>ariaControlsElements</code>, or use
 					another library.
 				</p>
@@ -1060,11 +1107,10 @@ disclosureNavigation.init();</code></pre>
 			};
 
 			const describe = event => {
-				const { $button, elements } = event.detail;
-				const label = $button.textContent.trim();
-				const outcome = event.defaultPrevented ? 'canceled' : `${elements.length} element(s)`;
+				const label = event.source?.textContent.trim();
+				const outcome = event.defaultPrevented ? ' · canceled' : '';
 
-				return `${event.type} · ${label} · ${outcome}`;
+				return `${event.type} · ${label} › #${event.target.id} · ${event.newState}${outcome}`;
 			};
 
 			const log = createLog(document.getElementById('playground-log'));
@@ -1072,14 +1118,19 @@ disclosureNavigation.init();</code></pre>
 
 			playground.init();
 
-			// Registered first, so the logger below sees defaultPrevented
-			$playground.addEventListener('disclosure-navigation:open', event => {
-				if ($lock.checked && event.detail.$button === $services) {
-					event.preventDefault();
-				}
-			});
-			$playground.addEventListener('disclosure-navigation:open', logEvent);
-			$playground.addEventListener('disclosure-navigation:close', logEvent);
+			// Toggle events do not bubble: listen in the capture phase. Registered first, so
+			// the logger below sees defaultPrevented
+			$playground.addEventListener(
+				'beforetoggle',
+				event => {
+					if ($lock.checked && 'open' === event.newState && event.source === $services) {
+						event.preventDefault();
+					}
+				},
+				{ capture: true },
+			);
+			$playground.addEventListener('beforetoggle', logEvent, { capture: true });
+			$playground.addEventListener('toggle', logEvent, { capture: true });
 
 			$arrowKeys.addEventListener('change', () => {
 				playground.useArrowKeys = $arrowKeys.checked;
@@ -1118,8 +1169,8 @@ disclosureNavigation.init();</code></pre>
 
 			new DisclosureNavigation($find).init();
 
-			$find.addEventListener('disclosure-navigation:open', event => logFind(describe(event)));
-			$find.addEventListener('disclosure-navigation:close', event => logFind(describe(event)));
+			$find.addEventListener('beforetoggle', event => logFind(describe(event)), { capture: true });
+			$find.addEventListener('toggle', event => logFind(describe(event)), { capture: true });
 		</script>
 	</body>
 </html>

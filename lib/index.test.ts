@@ -70,6 +70,23 @@ const supportsUntilFound = (() => {
 	return $element.hidden === 'until-found';
 })();
 
+/** Records the toggle events reaching `$target`, in the capture phase as they do not bubble. */
+const record = ($target: HTMLElement): string[] => {
+	const events: string[] = [];
+	const listener = (event: ToggleEvent): void => {
+		const $element = event.target as HTMLElement;
+
+		events.push(`${event.type} #${$element.id} ${event.oldState}→${event.newState}`);
+	};
+
+	$target.addEventListener('beforetoggle', listener, { capture: true });
+	$target.addEventListener('toggle', listener, { capture: true });
+
+	return events;
+};
+
+const nextTask = (): Promise<void> => new Promise(resolve => setTimeout(resolve));
+
 afterEach(() => {
 	disclosureNavigation?.destroy();
 	disclosureNavigation = null;
@@ -125,54 +142,116 @@ describe('click', () => {
 });
 
 describe('events', () => {
-	it('fires on the button, bubbles, and runs before the DOM changes', async () => {
-		mount();
+	it('fires beforetoggle before the change, and toggle in a later task', async () => {
+		const instance = mount();
+		const events = record($('nav'));
+		const hidden: (boolean | 'until-found')[] = [];
 
-		const $nav = $('nav');
-		const events: string[] = [];
+		$('about-menu').addEventListener('beforetoggle', () => hidden.push($('about-menu').hidden));
+		$('about-menu').addEventListener('toggle', () => hidden.push($('about-menu').hidden));
+		instance.open($('about'));
 
-		$nav.addEventListener('disclosure-navigation:open', event => {
-			events.push(event.type);
+		expect(events).toEqual(['beforetoggle #about-menu closed→open']);
 
-			expect(event.target).toBe($('about'));
-			expect(event.detail.$button).toBe($('about'));
-			expect(event.detail.elements).toEqual([$('about-menu')]);
-			expect($('about-menu').hidden).toBe(true);
-		});
-		$nav.addEventListener('disclosure-navigation:close', event => {
-			events.push(event.type);
+		await nextTask();
 
-			expect($('about-menu').hidden).toBe(false);
-		});
-
-		await userEvent.click($('about'));
-		await userEvent.click($('about'));
-
-		expect(events).toEqual(['disclosure-navigation:open', 'disclosure-navigation:close']);
+		expect(events).toEqual(['beforetoggle #about-menu closed→open', 'toggle #about-menu closed→open']);
+		expect(hidden).toEqual([true, false]);
 	});
 
-	it('cancels the change when a listener calls preventDefault()', async () => {
+	it('fires at the submenu with the button as source, without bubbling', async () => {
 		mount();
 
-		const $nav = $('nav');
+		const sources: (string | undefined)[] = [];
+		const bubbled: string[] = [];
 
-		$nav.addEventListener('disclosure-navigation:open', event => event.preventDefault());
+		$('about-menu').addEventListener('beforetoggle', event => sources.push(event.source?.id));
+		$('about-menu').addEventListener('toggle', event => sources.push(event.source?.id));
+		$('nav').addEventListener('beforetoggle', event => bubbled.push(event.type));
+		$('nav').addEventListener('toggle', event => bubbled.push(event.type));
 		await userEvent.click($('about'));
+		await nextTask();
+
+		expect(sources).toEqual(['about', 'about']);
+		expect(bubbled).toEqual([]);
+	});
+
+	it('cancels the opening when a listener calls preventDefault()', async () => {
+		mount();
+
+		const events = record($('nav'));
+
+		$('about-menu').addEventListener('beforetoggle', event => event.preventDefault());
+		await userEvent.click($('about'));
+		await nextTask();
 
 		expectExpanded('about', 'about-menu', false);
+		expect(events).toEqual(['beforetoggle #about-menu closed→open']);
 	});
 
-	it('keeps the open submenu when its close is canceled', async () => {
+	it('keeps the open submenu when another opening is canceled', async () => {
 		mount();
-
-		const $nav = $('nav');
-
 		await userEvent.click($('about'));
-		$nav.addEventListener('disclosure-navigation:close', event => event.preventDefault());
+
+		$('1-services').addEventListener('beforetoggle', event => event.preventDefault());
 		await userEvent.click($('services'));
 
 		expectExpanded('about', 'about-menu', true);
 		expectExpanded('services', '1-services', false);
+	});
+
+	it('cannot cancel a closing, as popovers', async () => {
+		mount();
+		await userEvent.click($('about'));
+
+		const cancelable: boolean[] = [];
+
+		$('about-menu').addEventListener('beforetoggle', event => {
+			cancelable.push(event.cancelable);
+			event.preventDefault();
+		});
+		await userEvent.click($('about'));
+
+		expectExpanded('about', 'about-menu', false);
+		expect(cancelable).toEqual([false]);
+	});
+
+	it('coalesces the changes made before toggle fires into one event', async () => {
+		const instance = mount();
+		const events = record($('nav'));
+
+		instance.open($('about'));
+		instance.close();
+		await nextTask();
+
+		expect(events.filter(event => event.startsWith('toggle'))).toEqual([
+			'toggle #about-menu closed→closed',
+		]);
+	});
+
+	it('fires at each submenu of a button, and opens none when one is canceled', () => {
+		const instance = mount(
+			markup
+				.replace('aria-controls="1-services"', 'aria-controls="1-services promo"')
+				.replace('</nav>', '<div id="promo" hidden><a href="#promo">Promo</a></div></nav>'),
+		);
+		const events = record($('nav'));
+
+		instance.open($('services'));
+		instance.close();
+		$('promo').addEventListener('beforetoggle', event => event.preventDefault());
+		instance.open($('services'));
+
+		expect(events).toEqual([
+			'beforetoggle #1-services closed→open',
+			'beforetoggle #promo closed→open',
+			'beforetoggle #1-services open→closed',
+			'beforetoggle #promo open→closed',
+			'beforetoggle #1-services closed→open',
+			'beforetoggle #promo closed→open',
+		]);
+		expectExpanded('services', '1-services', false);
+		expect($('promo').hidden).toBe(true);
 	});
 });
 
@@ -319,17 +398,6 @@ describe('focus', () => {
 		expect(document.activeElement).toBe($('about'));
 	});
 
-	it('leaves focus in the submenu when its close is canceled', async () => {
-		mount();
-		await userEvent.click($('about'));
-		$('nav').addEventListener('disclosure-navigation:close', event => event.preventDefault());
-
-		await press($('overview'), 'Escape');
-
-		expectExpanded('about', 'about-menu', true);
-		expect(document.activeElement).toBe($('overview'));
-	});
-
 	it('closes the submenu when its button is clicked while focus is inside it', async () => {
 		mount();
 		await userEvent.click($('about'));
@@ -380,6 +448,22 @@ describe('nested submenus', () => {
 		expectExpanded('about', 'about-menu', false);
 		expectExpanded('team', 'team-menu', false);
 		expectExpanded('services', '1-services', true);
+	});
+
+	it('closes the nested submenus innermost first, as nested popovers', () => {
+		const instance = mount();
+
+		instance.open($('about'));
+		instance.open($('team'));
+
+		const events = record($('nav'));
+
+		instance.close();
+
+		expect(events).toEqual([
+			'beforetoggle #team-menu open→closed',
+			'beforetoggle #about-menu open→closed',
+		]);
 	});
 
 	it('closes only the innermost submenu on Escape inside it', async () => {
@@ -444,18 +528,16 @@ describe.runIf(supportsUntilFound)('hidden="until-found"', () => {
 
 	it('opens the submenus revealed by fragment navigation, nested ones included', async () => {
 		const { $el } = mount(untilFound);
-		const events: string[] = [];
+		const sources: (string | undefined)[] = [];
 
-		$el.addEventListener('disclosure-navigation:open', event => {
-			events.push(event.detail.$button.id);
-		});
+		$el.addEventListener('beforetoggle', event => sources.push(event.source?.id), { capture: true });
 
 		location.hash = 'designers';
 
 		await expect.poll(() => $('about').getAttribute('aria-expanded')).toBe('true');
 		expectExpanded('team', 'team-menu', true);
 		expectExpanded('about', 'about-menu', true);
-		expect(events).toEqual(['team', 'about']);
+		expect(sources).toEqual(['team', 'about']);
 	});
 });
 
