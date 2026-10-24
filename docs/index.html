@@ -8,7 +8,7 @@
 			name="description"
 			content="Accessible WAI-ARIA disclosure navigation that enhances the HTML you write." />
 		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{top:calc(100% + .25rem);z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;inset-inline-start:0}.disclosure-nav__menu--end{inset-inline:auto 0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}.disclosure-nav__menu[hidden=until-found]{display:block!important}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{top:calc(100% + .25rem);z-index:1030;gap:.5rem;display:flex;position:absolute;inset-inline-start:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding-block:0;padding-inline:.75rem 0;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}.demo-dialog{border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);width:min(100% - 2rem,20rem);color:var(--bs-body-color);box-shadow:var(--bs-box-shadow-lg);padding:1rem}.demo-dialog::backdrop{background-color:#00000080}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
-		<script type="module" crossorigin src="./assets/index-BCbXaCet.js"></script>
+		<script type="module" crossorigin src="./assets/index-LGzI-8qi.js"></script>
 		<link rel="stylesheet" crossorigin href="./assets/index-B_Rliqau.css">
 	</head>
 
@@ -57,7 +57,7 @@
 								<li>
 									<a
 										href="https://github.com/19h47/19h47-disclosure-navigation#migration"
-										>Migrating from v3</a
+										>Migration guide</a
 									>
 								</li>
 							</ul>
@@ -114,7 +114,8 @@
 							<p class="small mb-0">
 								Native <code>&lt;button&gt;</code> for Enter and Space, the
 								<code>hidden</code> attribute, <code>ariaControlsElements</code> to
-								find submenus, <code>AbortController</code> to clean up.
+								find submenus, <code>ToggleEvent</code> as popovers fire it,
+								<code>AbortController</code> to clean up.
 							</p>
 						</div>
 					</div>
@@ -122,8 +123,8 @@
 						<div class="h-100 p-3 border rounded-3">
 							<h2 class="h6">Small and typed</h2>
 							<p class="small mb-0">
-								About 1&nbsp;kB gzipped, no dependency, TypeScript declarations and
-								typed events included.
+								About 1.5&nbsp;kB gzipped, no dependency, TypeScript declarations
+								included. The DOM library already types the events.
 							</p>
 						</div>
 					</div>
@@ -542,6 +543,11 @@ disclosureNavigation.init();</code></pre>
 					cancels the key press, so each press closes one layer: the submenu, then the
 					dialog. With every submenu closed, the browser handles the key.
 				</p>
+				<p>
+					The library sees <kbd>Escape</kbd> while focus is in the navigation. Safari does
+					not focus a clicked button: after opening a submenu with the mouse, focus stays
+					on the dialog and <kbd>Escape</kbd> closes it.
+				</p>
 				<button class="btn btn-outline-secondary" type="button" commandfor="dialog-demo" command="show-modal">
 					Open the mobile menu
 				</button>
@@ -674,48 +680,75 @@ disclosureNavigation.init();</code></pre>
 				</div>
 
 				<p class="mt-3">
-					The browser reveals the submenu whatever a listener does: canceling the
-					<code>open</code> event leaves the button collapsed next to a visible submenu.
+					The browser reveals the submenu whatever a listener does: canceling
+					<code>beforetoggle</code> leaves the button collapsed next to a visible submenu.
 				</p>
 			</section>
 
 			<section id="events" class="mb-5">
 				<h2>Events</h2>
 				<p>
-					Events fire on the button <strong>before</strong> the DOM changes and bubble, so
-					one listener on the navigation is enough. Call <code>preventDefault()</code> to
-					cancel the change.
+					The library fires the platform's events, the way a popover does: a
+					<code>ToggleEvent</code> named <code>beforetoggle</code>, then <code>toggle</code>,
+					at each submenu. The same listener works for <code>&lt;details&gt;</code>, popovers
+					and <code>&lt;dialog&gt;</code>.
 				</p>
 				<div class="table-responsive">
 					<table class="table table-sm align-middle">
 						<thead>
 							<tr>
 								<th scope="col">Event</th>
-								<th scope="col">Detail</th>
+								<th scope="col">Fires</th>
+								<th scope="col">Cancelable</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td><code>disclosure-navigation:open</code></td>
-								<td><code>{ $button, elements }</code></td>
+								<td><code>beforetoggle</code></td>
+								<td><strong>Before</strong> the DOM changes.</td>
+								<td>When the submenu opens.</td>
 							</tr>
 							<tr>
-								<td><code>disclosure-navigation:close</code></td>
-								<td><code>{ $button, elements }</code></td>
+								<td><code>toggle</code></td>
+								<td>
+									<strong>After</strong>, in a later task. Changes made before it fires
+									coalesce into one event, from the first old state to the last new
+									state.
+								</td>
+								<td>No.</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<pre><code class="language-javascript">$nav.addEventListener('disclosure-navigation:open', event => {
-	const { $button, elements } = event.detail;
-
-	if ('services' === $button.id) {
-		event.preventDefault(); // Services stays closed
-	}
-});</code></pre>
 				<p>
-					In TypeScript, both events are declared on <code>HTMLElementEventMap</code>:
-					<code>event.detail</code> is typed.
+					<code>event.target</code> is the submenu, <code>event.source</code> its button, and
+					<code>oldState</code> and <code>newState</code> are <code>'open'</code> or
+					<code>'closed'</code>. As on the platform, the events do not bubble: otherwise a
+					submenu's <code>toggle</code> would reach the <code>ontoggle</code> of a
+					<code>&lt;details&gt;</code> or a <code>&lt;dialog&gt;</code> holding the
+					navigation. Listen on the submenu, or on the navigation in the capture phase.
+				</p>
+				<pre><code class="language-javascript">$nav.addEventListener(
+	'beforetoggle',
+	event => {
+		if ('open' === event.newState && 'services' === event.source.id) {
+			event.preventDefault(); // Services stays closed
+		}
+	},
+	{ capture: true },
+);
+
+$nav.addEventListener(
+	'toggle',
+	event => console.log(event.target.id, event.newState),
+	{ capture: true },
+);</code></pre>
+				<p>
+					Canceling an opening leaves every submenu as it is, the open one included: the
+					other branches close after <code>beforetoggle</code>. Closing cannot be canceled.
+					A button that controls several elements fires at each one, and opens none of them
+					when one opening is canceled. In TypeScript, the DOM library already types both
+					events as <code>ToggleEvent</code>.
 				</p>
 			</section>
 
@@ -744,8 +777,9 @@ disclosureNavigation.init();</code></pre>
 							<tr>
 								<td><code>init()</code></td>
 								<td>
-									Listens to <code>click</code>, <code>keydown</code> and
-									<code>focusout</code> on <code>$nav</code>. Call
+									Listens to <code>click</code>, <code>keydown</code>,
+									<code>focusout</code> and <code>beforematch</code> on
+									<code>$nav</code>. Call
 									<code>destroy()</code> before calling it again.
 								</td>
 							</tr>
@@ -755,7 +789,11 @@ disclosureNavigation.init();</code></pre>
 							</tr>
 							<tr>
 								<td><code>open($button)</code></td>
-								<td>Closes the open submenu, then opens the one of <code>$button</code>.</td>
+								<td>
+									Opens the submenu of <code>$button</code> and closes the other
+									branches. Canceling its <code>beforetoggle</code> leaves every
+									submenu as it is.
+								</td>
 							</tr>
 							<tr>
 								<td><code>close($button?)</code></td>
@@ -803,10 +841,19 @@ disclosureNavigation.init();</code></pre>
 			<section id="support" class="mb-5">
 				<h2>Browser support</h2>
 				<p>
-					Submenus are resolved with
+					Version 5 runs in Chrome and Edge 135, Firefox 136 and Safari 17: submenus are
+					resolved with
 					<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaControlsElements"
 						><code>ariaControlsElements</code></a
-					>: Chrome and Edge 135, Firefox 136, Safari 16.4. For older browsers, load a
+					>
+					and events are
+					<a href="https://developer.mozilla.org/en-US/docs/Web/API/ToggleEvent"
+						><code>ToggleEvent</code></a
+					>s. <code>event.source</code> needs Chrome and Edge 140, Firefox 145 and Safari
+					26.5: older browsers fire the events without it.
+				</p>
+				<p>
+					For older browsers, stay on version 4.1, which runs from Safari 16.4, load a
 					polyfill of ARIA element reflection for <code>ariaControlsElements</code>, or use
 					another library.
 				</p>

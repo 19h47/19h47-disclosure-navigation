@@ -1,5 +1,19 @@
 # @19h47/disclosure-navigation
 
+## 5.0.0
+
+### Major Changes
+
+- Events are the platform's `beforetoggle` and `toggle`, fired the way a popover fires them. See the [migration guide](./README.md#from-4x-to-50).
+
+  - `disclosure-navigation:open` and `disclosure-navigation:close` are replaced by `beforetoggle`: a `ToggleEvent` fired at each submenu before the change, with `oldState`, `newState` and the button as `source`. It does not bubble: listen on the submenu, or on the navigation in the capture phase.
+  - New `toggle` event after the change, in a later task. Changes made before it fires coalesce into one event, from the first old state to the last new state.
+  - Only an opening can be canceled. The other branches now close after `beforetoggle`, so canceling an opening leaves the open submenu open.
+  - A button that controls several elements fires at each one, and opens none of them when one opening is canceled.
+  - Nested submenus close innermost first, as nested popovers do.
+  - The `Detail` type and the `HTMLElementEventMap` declarations are removed: the DOM library types both events.
+  - Browser support: Safari 17 is required for `ToggleEvent`, and `event.source` needs Chrome 140, Firefox 145 and Safari 26.5. Version 4.1 keeps running from Safari 16.4.
+
 ## 4.1.1
 
 ### Patch Changes

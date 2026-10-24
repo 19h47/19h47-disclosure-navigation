@@ -1,5 +1,5 @@
-import type { Detail } from './types';
-import { dispatchEvent, focusByKey } from './utils';
+import type { State } from './utils';
+import { dispatchBeforetoggle, focusByKey, queueToggle } from './utils';
 
 const BUTTONS = 'button[aria-expanded][aria-controls]';
 const TOP_LEVEL_ITEMS = `a[href], ${BUTTONS}`;
@@ -14,13 +14,18 @@ const controlledElements = ($button: HTMLButtonElement): HTMLElement[] =>
 const controls = ($button: HTMLButtonElement, $node: Node): boolean =>
 	controlledElements($button).some($element => $element.contains($node));
 
+/** Fires `beforetoggle` at each submenu of `$button`, `false` if the opening is canceled. */
+const beforetoggle = ($button: HTMLButtonElement, newState: State): boolean =>
+	controlledElements($button).every($element => dispatchBeforetoggle($element, newState, $button));
+
 /**
  * Disclosure Navigation
  *
  * Enhances a navigation whose buttons show and hide submenus. The markup is the
  * source of truth: `aria-expanded` on each button holds the state, and the submenus
  * are the elements its `aria-controls` references. The class never adds a missing
- * attribute; it only updates `aria-expanded` and `hidden` when the user interacts.
+ * attribute; it only updates `aria-expanded` and `hidden` when the user interacts,
+ * and fires `beforetoggle` and `toggle` at the submenus, as popovers do.
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/
  * @see https://w3c.github.io/aria/#dom-ariamixin-ariacontrolselements
@@ -60,20 +65,21 @@ class DisclosureNavigation {
 		this.#controller?.abort();
 	}
 
-	/** Opens the submenu of `$button`, after closing the open ones outside its branch. */
+	/**
+	 * Opens the submenu of `$button` and closes the open ones outside its branch, as
+	 * popovers do. Canceling its `beforetoggle` leaves every submenu as it is.
+	 */
 	open($button: HTMLButtonElement): void {
-		const closed = this.#expandedButtons
-			.filter(
-				$expanded =>
-					$expanded !== $button &&
-					!controls($expanded, $button) &&
-					!controls($button, $expanded),
-			)
-			.every($expanded => this.#expand($expanded, false));
-
-		if (closed) {
-			this.#expand($button, true);
+		if (isExpanded($button) || !beforetoggle($button, 'open')) {
+			return;
 		}
+
+		const others = this.#expandedButtons.filter(
+			$expanded => !controls($expanded, $button) && !controls($button, $expanded),
+		);
+
+		this.#collapse(others);
+		this.#expand($button, true);
 	}
 
 	/** Closes the submenu of `$button` and the ones nested in it, or every open submenu. */
@@ -84,7 +90,7 @@ class DisclosureNavigation {
 				)
 			: this.#expandedButtons;
 
-		buttons.forEach($expanded => this.#expand($expanded, false));
+		this.#collapse(buttons);
 	}
 
 	toggle($button: HTMLButtonElement): void {
@@ -116,28 +122,26 @@ class DisclosureNavigation {
 			.filter($item => !submenus.some($submenu => $submenu.contains($item)));
 	}
 
+	/** Closes the submenus of `buttons`, innermost first, as nested popovers do. */
+	#collapse(buttons: HTMLButtonElement[]): void {
+		buttons.toReversed().forEach($button => {
+			beforetoggle($button, 'closed');
+			this.#expand($button, false);
+		});
+	}
+
 	/**
 	 * Expand
 	 *
-	 * Fires the cancelable event, then updates `aria-expanded` and `hidden`.
-	 *
-	 * @returns `false` if a listener canceled the change.
+	 * Updates `aria-expanded` and `hidden`, and queues `toggle` at each submenu.
 	 */
-	#expand($button: HTMLButtonElement, expanded: boolean): boolean {
-		if (isExpanded($button) === expanded) {
-			return true;
-		}
-
-		const elements = controlledElements($button);
-		const name = expanded ? 'open' : 'close';
-		const detail: Detail = { $button, elements };
-
-		if (!dispatchEvent($button, name, detail)) {
-			return false;
-		}
+	#expand($button: HTMLButtonElement, expanded: boolean): void {
+		const newState = expanded ? 'open' : 'closed';
 
 		$button.ariaExpanded = expanded.toString();
-		elements.forEach($element => {
+		controlledElements($button).forEach($element => {
+			queueToggle($element, newState, $button);
+
 			if (expanded) {
 				this.#hidden.set($element, $element.hidden || true);
 				$element.hidden = false;
@@ -152,8 +156,6 @@ class DisclosureNavigation {
 
 			$element.hidden = this.#hidden.get($element) ?? true;
 		});
-
-		return true;
 	}
 
 	#handleClick = (event: MouseEvent): void => {
@@ -227,4 +229,3 @@ class DisclosureNavigation {
 }
 
 export default DisclosureNavigation;
-export type { Detail } from './types';
