@@ -21,7 +21,8 @@ export const dispatchEvent = ($target: EventTarget, name: string, detail: Detail
  * Focus by key
  *
  * Moves focus between `elements` with the arrow, Home and End keys, wrapping at both ends.
- * Keys pressed with a modifier are left to the browser.
+ * Left and right follow the reading direction of the focused element. Keys pressed with
+ * a modifier are left to the browser.
  */
 export const focusByKey = (event: KeyboardEvent, elements: HTMLElement[], index: number): void => {
 	if (event.altKey || event.ctrlKey || event.metaKey) {
@@ -31,11 +32,12 @@ export const focusByKey = (event: KeyboardEvent, elements: HTMLElement[], index:
 	const last = elements.length - 1;
 	const previous = index === 0 ? last : index - 1;
 	const next = index === last ? 0 : index + 1;
+	const rtl = elements[index].matches(':dir(rtl)');
 	const keys: Partial<Record<string, number>> = {
 		ArrowUp: previous,
-		ArrowLeft: previous,
+		ArrowLeft: rtl ? next : previous,
 		ArrowDown: next,
-		ArrowRight: next,
+		ArrowRight: rtl ? previous : next,
 		Home: 0,
 		End: last,
 	};

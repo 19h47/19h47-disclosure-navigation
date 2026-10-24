@@ -1,6 +1,6 @@
 {
 	"name": "@19h47/disclosure-navigation",
-	"version": "4.0.1",
+	"version": "4.1.0",
 	"description": "Accessible WAI-ARIA disclosure navigation, enhancing the markup you write.",
 	"keywords": [
 		"disclosure",
