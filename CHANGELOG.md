@@ -1,5 +1,12 @@
 # @19h47/disclosure-navigation
 
+## 4.1.1
+
+### Patch Changes
+
+- Escape closes one layer at a time. In a `<dialog>` or a popover, Escape is also a close request: it used to close the open submenu and the dialog together. While a submenu is open, the library now cancels the key press, so the dialog stays open until the next Escape. With every submenu closed, the browser handles the key.
+- Closing a submenu that holds the focus moves the focus to its button, whatever closes it: Escape, `close()`, or another submenu opening. The focused item used to disappear and send the focus to the page body. When a listener cancels the close, the focus stays where it is.
+
 ## 4.1.0
 
 ### Minor Changes

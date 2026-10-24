@@ -7,8 +7,8 @@
 		<meta
 			name="description"
 			content="Accessible WAI-ARIA disclosure navigation that enhances the HTML you write." />
-		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{top:calc(100% + .25rem);z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;inset-inline-start:0}.disclosure-nav__menu--end{inset-inline:auto 0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}.disclosure-nav__menu[hidden=until-found]{display:block!important}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{top:calc(100% + .25rem);z-index:1030;gap:.5rem;display:flex;position:absolute;inset-inline-start:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding-block:0;padding-inline:.75rem 0;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
-		<script type="module" crossorigin src="./assets/index-DmeVD6bB.js"></script>
+		<style>.disclosure-nav ul{margin:0;padding:0;list-style:none}.disclosure-nav>ul{flex-wrap:wrap;gap:.25rem;display:flex}.disclosure-nav>ul>li{position:relative}.disclosure-nav__item{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);font:inherit;background:0 0;border:0;align-items:center;gap:.5rem;padding:.5rem .75rem;text-decoration:none;display:inline-flex}.disclosure-nav__item:hover,.disclosure-nav__menu a:hover{background-color:var(--bs-tertiary-bg)}.disclosure-nav :focus-visible{outline:2px solid var(--bs-primary);outline-offset:2px}.disclosure-nav button[aria-expanded]:after{content:"";border:.125em solid;border-width:0 .125em .125em 0;width:.45em;height:.45em;transition:rotate .15s,translate .15s;translate:0 -.15em;rotate:45deg}.disclosure-nav button[aria-expanded=true]:after{translate:0 .15em;rotate:225deg}.disclosure-nav__menu{top:calc(100% + .25rem);z-index:1030;border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);min-width:13rem;box-shadow:var(--bs-box-shadow);transition:opacity .15s, translate .15s, display .15s allow-discrete;padding:.375rem;position:absolute;inset-inline-start:0}.disclosure-nav__menu--end{inset-inline:auto 0}.disclosure-nav__menu[hidden]{opacity:0;translate:0 -.25rem}.disclosure-nav__menu[hidden=until-found]{display:block!important}@starting-style{.disclosure-nav__menu{opacity:0;translate:0 -.25rem}}.disclosure-nav__menu a{border-radius:var(--bs-border-radius);color:var(--bs-emphasis-color);padding:.375rem .625rem;text-decoration:none;display:block}.disclosure-nav [aria-current]{color:var(--bs-primary);font-weight:600}.disclosure-nav__group{top:calc(100% + .25rem);z-index:1030;gap:.5rem;display:flex;position:absolute;inset-inline-start:0}.disclosure-nav__group>.disclosure-nav__menu{position:static}.disclosure-nav--vertical>ul{flex-direction:column}.disclosure-nav--vertical .disclosure-nav__item{justify-content:space-between;width:100%}.disclosure-nav--vertical .disclosure-nav__menu{box-shadow:none;border:0;padding-block:0;padding-inline:.75rem 0;position:static}@media (prefers-reduced-motion:reduce){.disclosure-nav button[aria-expanded]:after,.disclosure-nav__menu{transition:none}}[id]{scroll-margin-top:5rem}.playground{min-height:18rem}.playground-log{max-height:12rem;overflow-y:auto}.demo-dialog{border:var(--bs-border-width) solid var(--bs-border-color-translucent);border-radius:var(--bs-border-radius-lg);background-color:var(--bs-body-bg);width:min(100% - 2rem,20rem);color:var(--bs-body-color);box-shadow:var(--bs-box-shadow-lg);padding:1rem}.demo-dialog::backdrop{background-color:#00000080}pre[class*=language-]{border-radius:var(--bs-border-radius-lg)}</style>
+		<script type="module" crossorigin src="./assets/index-BCbXaCet.js"></script>
 		<link rel="stylesheet" crossorigin href="./assets/index-B_Rliqau.css">
 	</head>
 
@@ -532,6 +532,65 @@ disclosureNavigation.init();</code></pre>
 					direction from the markup with <code>:dir(rtl)</code>, so a <code>dir</code> attribute on
 					the page or the navigation is enough: try it in the playground.
 				</p>
+
+				<h3 class="h5 mt-4">In a dialog or a popover</h3>
+				<p>
+					<kbd>Escape</kbd> is also a
+					<a href="https://html.spec.whatwg.org/multipage/interaction.html#close-requests"
+						>close request</a
+					>: it closes the topmost dialog or popover. While a submenu is open, the library
+					cancels the key press, so each press closes one layer: the submenu, then the
+					dialog. With every submenu closed, the browser handles the key.
+				</p>
+				<button class="btn btn-outline-secondary" type="button" commandfor="dialog-demo" command="show-modal">
+					Open the mobile menu
+				</button>
+
+				<dialog id="dialog-demo" class="demo-dialog" aria-labelledby="dialog-demo-title">
+					<div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+						<h4 id="dialog-demo-title" class="h6 mb-0">Menu</h4>
+						<button
+							class="btn-close"
+							type="button"
+							commandfor="dialog-demo"
+							command="close"
+							aria-label="Close"></button>
+					</div>
+					<nav id="dialog-nav" class="disclosure-nav disclosure-nav--vertical" aria-label="Mobile">
+						<ul>
+							<li><a class="disclosure-nav__item" href="#keyboard">Home</a></li>
+							<li>
+								<button
+									class="disclosure-nav__item"
+									type="button"
+									aria-expanded="false"
+									aria-controls="dialog-nav-about">
+									About
+								</button>
+								<ul id="dialog-nav-about" class="disclosure-nav__menu" hidden>
+									<li><a href="#keyboard">Overview</a></li>
+									<li><a href="#keyboard">Team</a></li>
+								</ul>
+							</li>
+							<li>
+								<button
+									class="disclosure-nav__item"
+									type="button"
+									aria-expanded="false"
+									aria-controls="dialog-nav-services">
+									Services
+								</button>
+								<ul id="dialog-nav-services" class="disclosure-nav__menu" hidden>
+									<li><a href="#keyboard">Design</a></li>
+									<li><a href="#keyboard">Development</a></li>
+								</ul>
+							</li>
+						</ul>
+					</nav>
+				</dialog>
+				<p class="small text-body-secondary mt-2">
+					The dialog opens and closes with <code>commandfor</code>, without script.
+				</p>
 			</section>
 
 			<section id="find" class="mb-5">
@@ -700,7 +759,10 @@ disclosureNavigation.init();</code></pre>
 							</tr>
 							<tr>
 								<td><code>close($button?)</code></td>
-								<td>Closes the submenu of <code>$button</code>, or every open submenu.</td>
+								<td>
+									Closes the submenu of <code>$button</code>, or every open submenu.
+									Focus inside a closing submenu moves to its button.
+								</td>
 							</tr>
 							<tr>
 								<td><code>toggle($button)</code></td>

@@ -181,6 +181,20 @@
 				overflow-y: auto;
 			}
 
+			.demo-dialog {
+				width: min(100% - 2rem, 20rem);
+				padding: 1rem;
+				border: var(--bs-border-width) solid var(--bs-border-color-translucent);
+				border-radius: var(--bs-border-radius-lg);
+				background-color: var(--bs-body-bg);
+				color: var(--bs-body-color);
+				box-shadow: var(--bs-box-shadow-lg);
+			}
+
+			.demo-dialog::backdrop {
+				background-color: rgb(0 0 0 / 0.5);
+			}
+
 			pre[class*='language-'] {
 				border-radius: var(--bs-border-radius-lg);
 			}
@@ -707,6 +721,65 @@ disclosureNavigation.init();</code></pre>
 					direction from the markup with <code>:dir(rtl)</code>, so a <code>dir</code> attribute on
 					the page or the navigation is enough: try it in the playground.
 				</p>
+
+				<h3 class="h5 mt-4">In a dialog or a popover</h3>
+				<p>
+					<kbd>Escape</kbd> is also a
+					<a href="https://html.spec.whatwg.org/multipage/interaction.html#close-requests"
+						>close request</a
+					>: it closes the topmost dialog or popover. While a submenu is open, the library
+					cancels the key press, so each press closes one layer: the submenu, then the
+					dialog. With every submenu closed, the browser handles the key.
+				</p>
+				<button class="btn btn-outline-secondary" type="button" commandfor="dialog-demo" command="show-modal">
+					Open the mobile menu
+				</button>
+
+				<dialog id="dialog-demo" class="demo-dialog" aria-labelledby="dialog-demo-title">
+					<div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+						<h4 id="dialog-demo-title" class="h6 mb-0">Menu</h4>
+						<button
+							class="btn-close"
+							type="button"
+							commandfor="dialog-demo"
+							command="close"
+							aria-label="Close"></button>
+					</div>
+					<nav id="dialog-nav" class="disclosure-nav disclosure-nav--vertical" aria-label="Mobile">
+						<ul>
+							<li><a class="disclosure-nav__item" href="#keyboard">Home</a></li>
+							<li>
+								<button
+									class="disclosure-nav__item"
+									type="button"
+									aria-expanded="false"
+									aria-controls="dialog-nav-about">
+									About
+								</button>
+								<ul id="dialog-nav-about" class="disclosure-nav__menu" hidden>
+									<li><a href="#keyboard">Overview</a></li>
+									<li><a href="#keyboard">Team</a></li>
+								</ul>
+							</li>
+							<li>
+								<button
+									class="disclosure-nav__item"
+									type="button"
+									aria-expanded="false"
+									aria-controls="dialog-nav-services">
+									Services
+								</button>
+								<ul id="dialog-nav-services" class="disclosure-nav__menu" hidden>
+									<li><a href="#keyboard">Design</a></li>
+									<li><a href="#keyboard">Development</a></li>
+								</ul>
+							</li>
+						</ul>
+					</nav>
+				</dialog>
+				<p class="small text-body-secondary mt-2">
+					The dialog opens and closes with <code>commandfor</code>, without script.
+				</p>
 			</section>
 
 			<section id="find" class="mb-5">
@@ -875,7 +948,10 @@ disclosureNavigation.init();</code></pre>
 							</tr>
 							<tr>
 								<td><code>close($button?)</code></td>
-								<td>Closes the submenu of <code>$button</code>, or every open submenu.</td>
+								<td>
+									Closes the submenu of <code>$button</code>, or every open submenu.
+									Focus inside a closing submenu moves to its button.
+								</td>
 							</tr>
 							<tr>
 								<td><code>toggle($button)</code></td>
@@ -962,6 +1038,9 @@ disclosureNavigation.init();</code></pre>
 
 			// Sidebar: the open section comes from the markup
 			new DisclosureNavigation(document.getElementById('sidebar-nav')).init();
+
+			// Dialog: Escape closes the submenu first
+			new DisclosureNavigation(document.getElementById('dialog-nav')).init();
 
 			// Playground
 			const $playground = document.getElementById('playground-nav');
